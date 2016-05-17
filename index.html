@@ -23,6 +23,8 @@
 		<p>Country selected: <div id="country_selected"></div></p>
 		<p>Number of billionaires: <div id="number_billionaires"></div></p>
 	</div>
+	<div id="footer">
+		<p>Data comes from Forbes, as accessed through <a href="https://import.io/data/set/?mode=loadSet&set=f6bf4b86-ce14-4969-ba0a-eb2bdcbcb2a4">import.io.</a></p>  
 </body>
 
 <script>
@@ -253,8 +255,10 @@ function plot_countries (world, bilData, countryCodes, industryFilter) {
 	    	}
 	    })
     }
+    var max = Math.log(d3.max(d3.values(dict)));
 
-	var fillScale = d3.scale.linear().domain([0,3]).range([ "#fff", "#9ACD32"]);
+
+	var fillScale = d3.scale.linear().domain([0,max/3]).range([ "#fff", "#9ACD32"]);
     countryPaths.selectAll("path")
 		.style("fill", function (country) {
 			var countryName = country.id;

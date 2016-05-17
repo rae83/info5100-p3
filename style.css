@@ -29,7 +29,10 @@ body {
 	width: 50%;
 }
 
+/**/
 /* Style for the map */
+/**/
+
 svg {
 	/*border: 1px solid gray;*/
 }
@@ -71,4 +74,13 @@ svg {
 
 .point{
   	opacity:.6;
+}
+
+/**/
+/*Footer styling*/
+/**/
+
+#footer {
+	font-size: 0.8em;
+	float: bottom;
 }
