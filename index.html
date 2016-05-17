@@ -50,22 +50,10 @@ var path = d3.geo.path().projection(proj).pointRadius(1.5);
 
 var graticule = d3.geo.graticule();
 
-var zoom = d3.behavior.zoom()
-    .translate([0, 0])
-    .scale(1)
-    .scaleExtent([1, 8])
-    .on("zoom", zoomed);
-
 var svg = d3.select("#globe").append("svg")
     .attr("width", width)
     .attr("height", height)
     .on("mousedown", mousedown);
-
-svg.append("rect")
-    .attr("class", "overlay")
-    .attr("width", width)
-    .attr("height", height)
-    .call(zoom);
 
 queue()
     .defer(d3.json, "data/world-110m.json")
@@ -328,12 +316,6 @@ function refresh() {
   	svg.selectAll(".graticule").attr("d", path);
   	svg.selectAll(".point").attr("d", path);
   	position_labels();
-}
-
-function zoomed() {
-  	svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
- 	svg.selectAll(".countries").style("stroke-width", 1.5 / d3.event.scale + "px");
-  	svg.selectAll(".country").style("stroke-width", .5 / d3.event.scale + "px");
 }
 
 d3.select(self.frameElement).style("height", height + "px");

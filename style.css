@@ -37,11 +37,6 @@ svg {
 	/*border: 1px solid gray;*/
 }
 
-.overlay {
-  	fill: none;
-  	pointer-events: all;
-}
-
 .land {
  	/*fill: rgb(117, 87, 57);*/
   	stroke-opacity: 1;
