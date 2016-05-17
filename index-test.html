@@ -1,0 +1,112 @@
+<head>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v0.min.js"></script>
+</head>
+<body>
+<div id="map"></div>
+</body>
+
+<script>
+var degrees = 180 / Math.PI,
+    width = 1000,
+    height = 600;
+
+var loader = d3.dispatch("world"), id = -1;
+
+d3.selectAll("#map")
+    .data([
+      orthographicProjection(width, height)
+          .scale(245)
+          .translate([width / 2, height * .495]),
+      d3.geo.eisenlohr()
+          .precision(.1)
+          .clipExtent([[1, 1], [width - 1, height - 1]])
+          .translate([width / 2, height / 2])
+          .scale(75)
+          .rotate([0, -30])
+    ])
+  .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .each(function(projection) {
+      var path = d3.geo.path().projection(projection),
+          svg = d3.select(this).call(drawMap, path, true);
+      svg.selectAll(".foreground")
+      loader.on("world." + ++id, function() { svg.selectAll("path").attr("d", path); });
+    });
+
+(function() {
+  var width = 350, height = 350,
+      projection0 = orthographicProjection(width, height),
+      projection1 = orthographicProjection(width, height),
+      path0 = d3.geo.path().projection(projection0),
+      path1 = d3.geo.path().projection(projection1);
+
+
+  function redrawComparison1() { comparison1.selectAll("path").attr("d", path1); }
+})();
+
+
+
+d3.json("data/world-110m.json", function(error, world) {
+  d3.selectAll("svg").insert("path", ".foreground")
+      .datum(topojson.object(world, world.objects.land))
+      .attr("class", "land");
+  d3.selectAll("svg").insert("path", ".foreground")
+      .datum(topojson.mesh(world, world.objects.countries))
+      .attr("class", "mesh");
+
+  loader.world();
+});
+
+
+
+
+
+function drawMap(svg, path, mousePoint) {
+  var projection = path.projection();
+
+  svg.append("path")
+      .datum(d3.geo.graticule())
+      .attr("class", "graticule")
+      .attr("d", path);
+
+  svg.append("path")
+      .datum({type: "Sphere"})
+      .attr("class", "foreground")
+      .attr("d", path)
+      .on("mousedown.grab", function() {
+        var point;
+        if (mousePoint) point = svg.insert("path", ".foreground")
+            .datum({type: "Point", coordinates: projection.invert(d3.mouse(this))})
+            .attr("class", "point")
+            .attr("d", path);
+        var path = d3.select(this).classed("zooming", true),
+            w = d3.select(window).on("mouseup.grab", function() {
+              path.classed("zooming", false);
+              w.on("mouseup.grab", null);
+              if (mousePoint) point.remove();
+            });
+      });
+// d3.csv("data/cities.csv", function(error, data) {
+//   data.forEach(function(d){
+//      svg.insert("path", ".foreground")
+//     .datum({type: "Point", coordinates: [d['lon'], d['lat']]})
+//     .attr("class", "point")
+//     .attr("d", path);
+//   });
+// });
+
+}
+function orthographicProjection(width, height) {
+  return d3.geo.orthographic()
+      .precision(.5)
+      .clipAngle(90)
+      .clipExtent([[1, 1], [width - 1, height - 1]])
+      .translate([width / 2, height / 2])
+      .scale(width / 2 - 10)
+      .rotate([0, -30]);
+}
+</script>
