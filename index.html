@@ -4,8 +4,14 @@
 	<meta charset="utf-8">
 	<style>
 		svg {
-			border: 1px solid black;
+			/*border: 1px solid black;*/
 		}
+
+		#globe {
+			text-align: center;
+			margin: 0 auto;
+		}
+
 		.land {
 		  /*fill: rgb(117, 87, 57);*/
 		  stroke-opacity: 1;
@@ -16,15 +22,8 @@
 		  stroke-linejoin: round;
 		  stroke-width: 1;
 		  /*fill: rgb(117, 87, 57);*/
-		  opacity: 0.5;
+		  opacity: 0.1;
 		}
-
-		.countries path:hover {
-		  fill-opacity:.1;
-		  stroke-width:1;
-		  opacity: 1;
-		}
-
 
 		.graticule {
 		  fill: none;
@@ -55,6 +54,7 @@
 
 <body>
 	<div id='buttons'></div>
+	<div id='menu'></div>
 	<div id="globe"></div>
 </body>
 
@@ -68,11 +68,12 @@ d3.select(window)
     .on("mouseup", mouseup);
 
 var width = 360,
-    height = 500;
+    height = 500,
+    centered;
 
 var proj = d3.geo.orthographic()
 	// .scale(220)
-    .scale(width/2)
+    .scale(width/2.1)
     .translate([width / 2, height / 2])
     .clipAngle(90);
 
@@ -95,7 +96,7 @@ queue()
 
 function ready(error, world, places, bilData, countryCodes) {
 
-	// Builds the world map as a globe
+	// Styling the globe
 	var ocean_fill = svg.append("defs").append("radialGradient")
 	        .attr("id", "ocean_fill")
 	        .attr("cx", "75%")
@@ -149,11 +150,6 @@ function ready(error, world, places, bilData, countryCodes) {
         .attr("r", proj.scale())
         .attr("class", "noclicks")
         .style("fill", "url(#ocean_fill)");
-    
-    // svg.append("path")
-    //     .datum(topojson.object(world, world.objects.land))
-    //     .attr("class", "land")
-    //     .attr("d", path);
 
     svg.append("path")
         .datum(graticule)
@@ -173,21 +169,6 @@ function ready(error, world, places, bilData, countryCodes) {
         .style("fill", "url(#globe_shading)");
     // End of world building
 
-    // Adds the points
-    // svg.append("g").attr("class","points")
-    //     .selectAll("text").data(places.features)
-    //  	.enter().append("path")
-    //     .attr("class", "point")
-    //     .attr("d", path);
-    // console.log(places.features);
-
-	// Adds the labels for city
-    // svg.append("g").attr("class","labels")
-    //     .selectAll("text").data(places.features)
-    //   	.enter().append("text")
-    //   	.attr("class", "label")
-    //   	.text(function(d) {return d.properties.name })
-
     // uncomment for hover-able country outlines
     svg.append("g").attr("class","countries")
       .selectAll("path")
@@ -195,22 +176,30 @@ function ready(error, world, places, bilData, countryCodes) {
       .enter().append("path")
         .attr("d", path);
 
-    // svg.append("g").attr("class","points")
-    //     .selectAll("text").data(bilData)
-    //  	.enter().append("path")
-    //     .attr("class", "point")
-    //     .attr("d", path);
-
     position_labels();
 
+    // End of world set up
+
+    // Beginning of adding and plotting data as a choropleth
+
     var industries = ["All", "Technology", "Telecom", "Retail", "Investments", "Diversified", "Gaming", "Fashion and Retail", "Finance", "Food and Beverage", "Manufacturing", "Media", "Real Estate", "Energy", "Metals & Mining", "Automotive", "Business", "Logistics", "Construction & Engineering", "Health care", "Service", "Medicine", "Sports", "Oil"];
-    d3.select("#buttons").selectAll("input").data(industries).enter().append("input").attr("type","button").attr("class","button").attr("id", function (d) {return d;}).attr("value", function (d) {return d;} )
+    // d3.select("#buttons").selectAll("input").data(industries).enter().append("input").attr("type","button").attr("class","button").attr("id", function (d) {return d;}).attr("value", function (d) {return d;} )
+
+    var select = d3.select("#menu")
+                .append("select")
+                .attr("id","dropdown")
+                .on("change", function() { plot_countries(world, bilData, countryCodes, this.value); });
+                // adds the options
+                select.selectAll("option")
+                .data(industries)
+                .enter().append("option")
+                .attr("value", function(d) { return d;})
+                .text(function(d) { return d; });
 
 	plot_countries (world, bilData, countryCodes, "All"); 
 
 	d3.selectAll(".button").on("click", function(){
 	    plot_countries(world, bilData, countryCodes, this.id);
-	    // document.getElementById("typeChosen").innerHTML = clickedId;
 	});  
 } 
 
@@ -224,11 +213,15 @@ function plot_countries (world, bilData, countryCodes, industryFilter) {
         .datum(graticule)
         .attr("class", "graticule noclicks")
         .attr("d", path);
-    svg.append("g").attr("class","countries")
-      .selectAll("path")
-        .data(topojson.object(world, world.objects.countries).geometries)
-      .enter().append("path")
-        .attr("d", path);
+
+	// creating a dictionary with the key being country 3-letter code and value is id number
+    var codeDict = {};
+    // creating dictionary with key 3-letter code and value country name
+    var nameDict = {}; 
+    countryCodes.forEach(function (country) {
+    	codeDict[country.code] = Number(country.id);
+    	nameDict[country.id] = country.name;
+    })
 
     var dict = {};
     var countries = topojson.object(world, world.objects.countries).geometries;
@@ -236,13 +229,20 @@ function plot_countries (world, bilData, countryCodes, industryFilter) {
     countryPaths.selectAll("path").data(countries).enter()
 	.append("path")
 	.attr("d", path);
-    var codeDict = {};
+    svg.append("g").attr("class","countries")
+      	.selectAll("path")
+        .data(topojson.object(world, world.objects.countries).geometries)
+      	.enter().append("path")
+        .attr("d", path)
+        .on("click", function (d) {
+        	var value = dict[d.id];
+        	if (value == undefined) { value = 0;}
+        	console.log(nameDict[d.id] + ", " + value);
+        	return d.id;
+        });
 
-    // creating a dictionary with the key being country id and value being number of billionaires
-    countryCodes.forEach(function (country) {
-    	codeDict[country.code] = Number(country.id);
-    })
 
+	// creating dictionary where key is country id number and value is the number of billionaires
     if (industryFilter == "All") {
 	    bilData.forEach(function (person) {
     		var key = codeDict[person.country];
@@ -276,6 +276,33 @@ function plot_countries (world, bilData, countryCodes, industryFilter) {
 			if(!value) return fillScale(Math.log(0));
 			return fillScale(Math.log(value));
 		}).attr("opacity", 0.75).attr("class", "country")
+}
+
+// zoom code from https://bl.ocks.org/mbostock/2206590
+function clicked(d) {
+  	var x, y, k;
+
+  	if (d && centered !== d) {
+	    var centroid = path.centroid(d);
+	    x = centroid[0];
+	    y = centroid[1];
+	    k = 4;
+	    centered = d;
+  	} else {
+	    x = width / 2;
+	    y = height / 2;
+	    k = 1;
+	    centered = null;
+  	}
+
+  	svg.selectAll("path")
+ 	 	.classed("active", centered && function(d) { return d === centered; });
+
+  	svg.transition()
+      	.duration(750)
+      	.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+      	.style("stroke-width", 1.5 / k + "px");
+    console.log("zoomed");
 }
 
 function position_labels() {
