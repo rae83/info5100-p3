@@ -2,65 +2,27 @@
 <!DOCTYPE html>
 <head>
 	<meta charset="utf-8">
-	<style>
-		svg {
-			/*border: 1px solid black;*/
-		}
-
-		.overlay {
-		  	fill: none;
-		  	pointer-events: all;
-		}
-
-		#globe {
-			text-align: center;
-			margin: 0 auto;
-		}
-
-		.land {
-		 	/*fill: rgb(117, 87, 57);*/
-		  	stroke-opacity: 1;
-		}
-
-		.countries path {
-		  	stroke: rgb(80, 64, 39);  
-		  	stroke-linejoin: round;
-		  	stroke-width: 1;
-		  	/*fill: rgb(117, 87, 57);*/
-		  	opacity: 0.1;
-		}
-
-		.graticule {
-		  	fill: none;
-		  	stroke: black;
-		  	stroke-width: 0.5;
-		  	opacity: 0.2;
-		}
-
-		.labels {
-		    font: 8px sans-serif;
-		    fill: black;
-		    opacity: .5;
-		}
-
-		.noclicks {
-		  	pointer-events:none;
-		}
-
-		.point{
-		  	opacity:.6;
-		}
-	</style>
 	<script src="http://d3js.org/d3.v3.min.js"></script>
 	<script src="http://d3js.org/queue.v1.min.js"></script>
 	<script src="http://d3js.org/topojson.v0.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
+	<div id="title">
+		<h2> So you want to be a <span class="emphasized">billionaire?</span></h2>
+	</div>
+	<div id="paragraph">
+		<p>In 2014, there were <span class="emphasized">1,645 billionaires</span> in the world.  Together, these individuals represents a net worth of more than $6.4 trillion.  The visualizations presented here illustrate how billionaires are distributed around the world, the industires that made them wealthy and other characteristics, such as age.</p>
+	</div>
 	<div id='buttons'></div>
-	<div id='menu'></div>
 	<div id="globe"></div>
+	<div id='menu'></div>
+	<div id="outputs">
+		<p>Country selected: <div id="country_selected"></div></p>
+		<p>Number of billionaires: <div id="number_billionaires"></div></p>
+	</div>
 </body>
 
 <script>
@@ -197,10 +159,18 @@ function ready(error, world, bilData, countryCodes) {
     // End of world set up
 
     // Beginning of adding and plotting data as a choropleth
+	plot_countries (world, bilData, countryCodes, "All"); 
 
     var industries = ["All", "Technology", "Telecom", "Retail", "Investments", "Diversified", "Gaming", "Fashion and Retail", "Finance", "Food and Beverage", "Manufacturing", "Media", "Real Estate", "Energy", "Metals & Mining", "Automotive", "Business", "Logistics", "Construction & Engineering", "Health care", "Service", "Medicine", "Sports", "Oil"];
+    
+    // uncomment the following code to use buttons instead of the dropdown
     // d3.select("#buttons").selectAll("input").data(industries).enter().append("input").attr("type","button").attr("class","button").attr("id", function (d) {return d;}).attr("value", function (d) {return d;} )
 
+	// d3.selectAll(".button").on("click", function(){
+	//     plot_countries(world, bilData, countryCodes, this.id);
+	// });  
+
+    // create a dropdown
     var select = d3.select("#menu")
                 .append("select")
                 .attr("id","dropdown")
@@ -212,11 +182,6 @@ function ready(error, world, bilData, countryCodes) {
                 .attr("value", function(d) { return d;})
                 .text(function(d) { return d; });
 
-	plot_countries (world, bilData, countryCodes, "All"); 
-
-	d3.selectAll(".button").on("click", function(){
-	    plot_countries(world, bilData, countryCodes, this.id);
-	});  
 } 
 
 
@@ -255,6 +220,10 @@ function plot_countries (world, bilData, countryCodes, industryFilter) {
         	var value = dict[d.id];
         	if (value == undefined) { value = 0;}
         	console.log(nameDict[d.id] + ", " + value);
+        	document.getElementById("country_selected").innerHTML = nameDict[d.id];
+        	document.getElementById("number_billionaires").innerHTML = value;
+        	d3.select("#country_selected").attr("innerHTML", nameDict[d.id]);
+        	d3.select("#number_billionaires").attr("innerHTML", value);
         	return d.id;
         });
 

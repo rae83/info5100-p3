@@ -1,0 +1,74 @@
+
+body {
+	width: 80%;
+	margin: 0 auto;
+	/*border: 1px solid black;*/
+}
+
+#title {
+	margin-top: 2%;
+}
+
+.emphasized {
+	font-weight: bolder;
+	color: green;
+}
+
+#globe, #menu {
+	text-align: center;
+	margin: auto;
+}
+
+#globe {
+	float: left;
+	width: 50%;
+}
+
+#menu {
+	float: left; 
+	width: 50%;
+}
+
+/* Style for the map */
+svg {
+	/*border: 1px solid gray;*/
+}
+
+.overlay {
+  	fill: none;
+  	pointer-events: all;
+}
+
+.land {
+ 	/*fill: rgb(117, 87, 57);*/
+  	stroke-opacity: 1;
+}
+
+.countries path {
+  	stroke: rgb(80, 64, 39);  
+  	stroke-linejoin: round;
+  	stroke-width: 1;
+  	/*fill: rgb(117, 87, 57);*/
+  	opacity: 0.1;
+}
+
+.graticule {
+  	fill: none;
+  	stroke: black;
+  	stroke-width: 0.5;
+  	opacity: 0.2;
+}
+
+.labels {
+    font: 8px sans-serif;
+    fill: black;
+    opacity: .5;
+}
+
+.noclicks {
+  	pointer-events:none;
+}
+
+.point{
+  	opacity:.6;
+}
