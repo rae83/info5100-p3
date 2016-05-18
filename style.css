@@ -10,7 +10,6 @@ body div {
 
 #title {
 	margin-top: 2%;
-	size: 4em;
 }
 
 .emphasized {
@@ -20,7 +19,7 @@ body div {
 
 #paragraph {
 	margin-top: 2%;
-	min-width: 250px;
+	padding-left: 10px;
 }
 
 #spacer {
