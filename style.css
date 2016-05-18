@@ -4,14 +4,29 @@ body {
 	margin: 0 auto;
 	/*border: 1px solid black;*/
 }
+body div {
+	/*border: 1px solid black;*/
+}
 
 #title {
 	margin-top: 2%;
+	size: 4em;
 }
 
 .emphasized {
 	font-weight: bolder;
 	color: green;
+}
+
+#paragraph {
+	margin-top: 2%;
+	min-width: 250px;
+}
+
+#spacer {
+	margin: 0 auto;
+	border: 1px solid lightgray;
+	width: 50%;
 }
 
 #globe, #menu {
@@ -20,13 +35,22 @@ body {
 }
 
 #globe {
-	float: left;
-	width: 50%;
+	/*float: left;
+	width: 50%;*/
+}
+
+#right-side {
+	min-width: 360px;
+	margin-top: 40px;
 }
 
 #menu {
-	float: left; 
-	width: 50%;
+	/*float: left; 
+	width: 50%;*/
+}
+
+#outputs {
+	min-width: 360px;
 }
 
 /**/

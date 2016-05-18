@@ -10,19 +10,30 @@
 </head>
 
 <body>
-	<div id="title">
-		<h2> So you want to be a <span class="emphasized">billionaire?</span></h2>
+	<div class="row">
+		<div class="six columns" id="title">
+			<h1> So you want to be a <span class="emphasized">billionaire?</span></h1>
+		</div>
+		<div class ="six columns" id="paragraph">
+			<p>In 2014, there were <span class="emphasized">1,645 billionaires</span> in the world.  Together, these individuals represent a net worth of more than $6.4 trillion.  The visualizations presented here illustrate how billionaires are distributed around the world, the industires that made them wealthy and other characteristics, such as age and education.</p>
+			<p>The globe rotates to show where billionaires live around the world.  Data can be filtered by industry.  Click on the map to see the country selected and number of billionaires from the country in question.</p>
+		</div>
 	</div>
-	<div id="paragraph">
-		<p>In 2014, there were <span class="emphasized">1,645 billionaires</span> in the world.  Together, these individuals represent a net worth of more than $6.4 trillion.  The visualizations presented here illustrate how billionaires are distributed around the world, the industires that made them wealthy and other characteristics, such as age and education.</p>
-	</div>
+	<div id="spacer"></div>
 	<div id='buttons'></div>
-	<div id="globe"></div>
-	<div id='menu'></div>
-	<div id="outputs">
-		<p>Country selected: <div id="country_selected"></div> </p>
-		<p>Number of billionaires: <div id="number_billionaires"> </div></p>
-	</div>
+	<div class="row">
+		<div class="six columns" id="globe"></div>
+		<div class="six columns" id="right-side">
+			<div id='menu'></div>
+			<div id="outputs">
+				<p class="emphasized">Country selected:</p>
+				<div id="country_selected">---</div>
+				<br>
+				<p class="emphasized">Number of billionaires:</p>
+				<div id="number_billionaires">---</div>
+			</div>	
+		</div>
+	</div>	
 	<div id="footer">
 		<p>Data comes from Forbes, as accessed through <a href="https://import.io/data/set/?mode=loadSet&set=f6bf4b86-ce14-4969-ba0a-eb2bdcbcb2a4">import.io.</a></p>  
 </body>
