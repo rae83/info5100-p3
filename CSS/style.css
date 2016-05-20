@@ -22,7 +22,7 @@ body div {
 	padding-left: 10px;
 }
 
-#spacer {
+.spacer {
 	margin: 0 auto;
 	border: 1px solid lightgray;
 	width: 50%;
@@ -92,6 +92,40 @@ svg {
 
 .point{
   	opacity:.6;
+}
+
+/**/
+/*styling for college plot*/
+/**/
+
+#college-text {margin-top: 30px;}
+
+.chart {margin-top: 0px;}
+
+.chart .legend {
+  fill: steelblue;
+  font: 14px sans-serif;
+  text-anchor: start;
+  font-size: 12px;
+}
+
+.chart text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
+
+.chart .label {
+  fill: white;
+  font: 14px sans-serif;
+  text-anchor: end;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
 /**/

@@ -5,20 +5,23 @@
 	<script src="http://d3js.org/d3.v3.min.js"></script>
 	<script src="http://d3js.org/queue.v1.min.js"></script>
 	<script src="http://d3js.org/topojson.v0.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
-	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="CSS/skeleton.css">
+	<link rel="stylesheet" type="text/css" href="CSS/style.css">
 </head>
 
 <body>
+	<!-- intro and globe -->
 	<div class="row">
 		<div class="six columns" id="title">
 			<h1> So you want to be a <span class="emphasized">billionaire?</span></h1>
 		</div>
 		<div class ="six columns" id="paragraph">
-			<p>In 2014, there were <span class="emphasized">1,645 billionaires</span> in the world.  Together, these individuals represent a net worth of more than $6.4 trillion.  Rotate the globe below to see where billionaires live around the world.  You can filter the data by industry and click the map to see the country selected and the number of billionaires from the country is question.</p>
+			<p>In 2014, there were <span class="emphasized">1,645 billionaires</span> in the world.  Together, these individuals represent a net worth of more than $6.4 trillion.  Rotate the globe below to see where billionaires live around the world.  You can filter the data by industry and click the map to see the country selected and the number of billionaires from the country in question.</p>
 		</div>
 	</div>
-	<div id="spacer"></div>
+
+	<div class="spacer"></div>
+
 	<div id='buttons'></div>
 	<div class="row">
 		<div class="six columns" id="globe"></div>
@@ -32,277 +35,433 @@
 				<div id="number_billionaires">---</div>
 			</div>	
 		</div>
-	</div>	
+	</div>
+	<!-- end intro and globe -->
+
+	<div class="spacer"></div>
+
+	<!-- begin college plot -->
+	<div id="college-text">
+		<p>Although many billionaires are famous for being college dropouts, going to a top-notch school is still a great step in the direction towards becoming a billionaire.  After all, <span class="emphasized">44.8% of American billionaires attended one of the top-rank schools</span> listed below.</p>
+	</div>
+	<svg class="chart"></svg>
+	<!-- end college plot -->
+
 	<div id="footer">
-		<p>Data comes from Forbes, as accessed through <a href="https://import.io/data/set/?mode=loadSet&set=f6bf4b86-ce14-4969-ba0a-eb2bdcbcb2a4">import.io.</a></p>  
+		<p>Data on billionaires, their countries, ages, industries and networth comes from Forbes, as accessed through <a href="https://import.io/data/set/?mode=loadSet&set=f6bf4b86-ce14-4969-ba0a-eb2bdcbcb2a4">import.io.</a> Data on colleges comes from <a href="http://www.businessinsider.com/schools-with-most-billionaires-2014-10">Business Insider</a></p>
 </body>
 
+<!-- make the globe visualization -->
 <script>
-// Portions of code below modified from the following sources
-// http://bl.ocks.org/3795040
-// http://bl.ocks.org/dwtkns/4686432
+	// Portions of code below modified from the following sources
+	// http://bl.ocks.org/3795040
+	// http://bl.ocks.org/dwtkns/4686432
+	makeGlobe();
 
-d3.select(window)
-    .on("mousemove", mousemove)
-    .on("mouseup", mouseup);
+	function makeGlobe() {
+		d3.select(window)
+		    .on("mousemove", mousemove)
+		    .on("mouseup", mouseup);
 
-var width = 360,
-    height = 450,
-    centered;
+		var width = 360,
+		    height = 450,
+		    centered;
 
-var proj = d3.geo.orthographic()
-	// .scale(220)
-    .scale(width/2.1)
-    .translate([width / 2, height / 2])
-    .clipAngle(90);
+		var proj = d3.geo.orthographic()
+			// .scale(220)
+		    .scale(width/2.1)
+		    .translate([width / 2, height / 2])
+		    .clipAngle(90);
 
-var path = d3.geo.path().projection(proj).pointRadius(1.5);
+		var path = d3.geo.path().projection(proj).pointRadius(1.5);
 
-var graticule = d3.geo.graticule();
+		var graticule = d3.geo.graticule();
 
-var svg = d3.select("#globe").append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .on("mousedown", mousedown);
+		var svg = d3.select("#globe").append("svg")
+		    .attr("width", width)
+		    .attr("height", height)
+		    .on("mousedown", mousedown);
 
-queue()
-    .defer(d3.json, "data/world-110m.json")
-    .defer(d3.csv, "data/data.csv")
-    .defer(d3.csv, "data/countries.csv")
-    .await(ready);
-
-
-function ready(error, world, bilData, countryCodes) {
-
-	// Styling the globe
-	var ocean_fill = svg.append("defs").append("radialGradient")
-	        .attr("id", "ocean_fill")
-	        .attr("cx", "75%")
-	        .attr("cy", "25%");
-	    ocean_fill.append("stop").attr("offset", "5%").attr("stop-color", "#ddf");
-	    ocean_fill.append("stop").attr("offset", "100%").attr("stop-color", "#9ab");
-
-	var globe_highlight = svg.append("defs").append("radialGradient")
-	        .attr("id", "globe_highlight")
-	        .attr("cx", "75%")
-	        .attr("cy", "25%");
-	    globe_highlight.append("stop")
-	        .attr("offset", "5%").attr("stop-color", "#ffd")
-	        .attr("stop-opacity","0.6");
-	    globe_highlight.append("stop")
-	        .attr("offset", "100%").attr("stop-color", "#ba9")
-	        .attr("stop-opacity","0.2");
-
-	var globe_shading = svg.append("defs").append("radialGradient")
-	        .attr("id", "globe_shading")
-	        .attr("cx", "50%")
-	        .attr("cy", "40%");
-	    globe_shading.append("stop")
-	        .attr("offset","50%").attr("stop-color", "#9ab")
-	        .attr("stop-opacity","0")
-	    globe_shading.append("stop")
-	        .attr("offset","100%").attr("stop-color", "#3e6184")
-	        .attr("stop-opacity","0.3")
-
-	var drop_shadow = svg.append("defs").append("radialGradient")
-	        .attr("id", "drop_shadow")
-	        .attr("cx", "50%")
-	        .attr("cy", "50%");
-	    drop_shadow.append("stop")
-	        .attr("offset","20%").attr("stop-color", "#000")
-	        .attr("stop-opacity",".5")
-	    drop_shadow.append("stop")
-	        .attr("offset","100%").attr("stop-color", "#000")
-	        .attr("stop-opacity","0")  
-
-    svg.append("ellipse")
-    	// .attr("cx", 440).attr("cy", 450)
-        .attr("cx", width/2.5).attr("cy", height / 1.2)
-        .attr("rx", proj.scale()*.90)
-        .attr("ry", proj.scale()*.25)
-        .attr("class", "noclicks")
-        .style("fill", "url(#drop_shadow)");
-
-    svg.append("circle")
-        .attr("cx", width / 2).attr("cy", height / 2)
-        .attr("r", proj.scale())
-        .attr("class", "noclicks")
-        .style("fill", "url(#ocean_fill)");
-
-    svg.append("path")
-        .datum(graticule)
-        .attr("class", "graticule noclicks")
-        .attr("d", path);
-
-    svg.append("circle")
-        .attr("cx", width / 2).attr("cy", height / 2)
-        .attr("r", proj.scale())
-        .attr("class","noclicks")
-        .style("fill", "url(#globe_highlight)");
-
-    svg.append("circle")
-        .attr("cx", width / 2).attr("cy", height / 2)
-        .attr("r", proj.scale())
-        .attr("class","noclicks")
-        .style("fill", "url(#globe_shading)");
-    // End of world building
-
-    // uncomment for hover-able country outlines
-    svg.append("g").attr("class","countries")
-      .selectAll("path")
-        .data(topojson.object(world, world.objects.countries).geometries)
-      .enter().append("path")
-        .attr("d", path);
-
-    // End of world set up -- also the end of cody modified from the above sources
-
-    // Beginning of adding and plotting data as a choropleth
-	plot_countries (world, bilData, countryCodes, "All"); 
-
-    var industries = ["All", "Technology", "Telecom", "Retail", "Investments", "Diversified", "Gaming", "Fashion and Retail", "Finance", "Food and Beverage", "Manufacturing", "Media", "Real Estate", "Energy", "Metals & Mining", "Automotive", "Business", "Logistics", "Construction & Engineering", "Health care", "Service", "Medicine", "Sports", "Oil"];
-    
-    // uncomment the following code to use buttons instead of the dropdown
-    // d3.select("#buttons").selectAll("input").data(industries).enter().append("input").attr("type","button").attr("class","button").attr("id", function (d) {return d;}).attr("value", function (d) {return d;} )
-
-	// d3.selectAll(".button").on("click", function(){
-	//     plot_countries(world, bilData, countryCodes, this.id);
-	// });  
-
-    // create a dropdown
-    var select = d3.select("#menu")
-                .append("select")
-                .attr("id","dropdown")
-                .on("change", function() { plot_countries(world, bilData, countryCodes, this.value); });
-                // adds the options
-                select.selectAll("option")
-                .data(industries)
-                .enter().append("option")
-                .attr("value", function(d) { return d;})
-                .text(function(d) { return d; });
-
-} 
+		queue()
+		    .defer(d3.json, "data/world-110m.json")
+		    .defer(d3.csv, "data/data.csv")
+		    .defer(d3.csv, "data/countries.csv")
+		    .await(ready);
 
 
-function plot_countries (world, bilData, countryCodes, industryFilter) {
-	// creating the choropleth coloring
-    // bilData comes from data.csv, has country codes as 'country'
-    // can match this code to countries.csv 'code' and then to 'id', which matches the map
-    d3.selectAll("path").remove();
+		var industries = ["All", "Technology", "Telecom", "Retail", "Investments", "Diversified", "Gaming", "Fashion and Retail", "Finance", "Food and Beverage", "Manufacturing", "Media", "Real Estate", "Energy", "Metals & Mining", "Automotive", "Business", "Logistics", "Construction & Engineering", "Health care", "Service", "Medicine", "Sports", "Oil"];
 
-    svg.append("path")
-        .datum(graticule)
-        .attr("class", "graticule noclicks")
-        .attr("d", path);
+		function ready(error, world, bilData, countryCodes) {
 
-	// creating a dictionary with the key being country 3-letter code and value is id number
-    var codeDict = {};
-    // creating dictionary with key 3-letter code and value country name
-    var nameDict = {}; 
-    countryCodes.forEach(function (country) {
-    	codeDict[country.code] = Number(country.id);
-    	nameDict[country.id] = country.name;
-    })
+			// Styling the globe
+			var ocean_fill = svg.append("defs").append("radialGradient")
+			        .attr("id", "ocean_fill")
+			        .attr("cx", "75%")
+			        .attr("cy", "25%");
+			    ocean_fill.append("stop").attr("offset", "5%").attr("stop-color", "#ddf");
+			    ocean_fill.append("stop").attr("offset", "100%").attr("stop-color", "#9ab");
 
-    var dict = {};
-    var countries = topojson.object(world, world.objects.countries).geometries;
-    var countryPaths = svg.append('g');
-    countryPaths.selectAll("path").data(countries).enter()
-	.append("path")
-	.attr("d", path);
-    svg.append("g").attr("class","countries")
-      	.selectAll("path")
-        .data(topojson.object(world, world.objects.countries).geometries)
-      	.enter().append("path")
-        .attr("d", path)
-        .on("click", function (d) {
-        	var value = dict[d.id];
-        	if (value == undefined) { value = 0;}
-        	console.log(nameDict[d.id] + ", " + value);
-        	document.getElementById("country_selected").innerHTML = nameDict[d.id];
-        	document.getElementById("number_billionaires").innerHTML = value;
-        	d3.select("#country_selected").attr("innerHTML", nameDict[d.id]);
-        	d3.select("#number_billionaires").attr("innerHTML", value);
-        	return d.id;
-        });
+			var globe_highlight = svg.append("defs").append("radialGradient")
+			        .attr("id", "globe_highlight")
+			        .attr("cx", "75%")
+			        .attr("cy", "25%");
+			    globe_highlight.append("stop")
+			        .attr("offset", "5%").attr("stop-color", "#ffd")
+			        .attr("stop-opacity","0.6");
+			    globe_highlight.append("stop")
+			        .attr("offset", "100%").attr("stop-color", "#ba9")
+			        .attr("stop-opacity","0.2");
+
+			var globe_shading = svg.append("defs").append("radialGradient")
+			        .attr("id", "globe_shading")
+			        .attr("cx", "50%")
+			        .attr("cy", "40%");
+			    globe_shading.append("stop")
+			        .attr("offset","50%").attr("stop-color", "#9ab")
+			        .attr("stop-opacity","0")
+			    globe_shading.append("stop")
+			        .attr("offset","100%").attr("stop-color", "#3e6184")
+			        .attr("stop-opacity","0.3")
+
+			var drop_shadow = svg.append("defs").append("radialGradient")
+			        .attr("id", "drop_shadow")
+			        .attr("cx", "50%")
+			        .attr("cy", "50%");
+			    drop_shadow.append("stop")
+			        .attr("offset","20%").attr("stop-color", "#000")
+			        .attr("stop-opacity",".5")
+			    drop_shadow.append("stop")
+			        .attr("offset","100%").attr("stop-color", "#000")
+			        .attr("stop-opacity","0")  
+
+		    svg.append("ellipse")
+		    	// .attr("cx", 440).attr("cy", 450)
+		        .attr("cx", width/2.5).attr("cy", height / 1.2)
+		        .attr("rx", proj.scale()*.90)
+		        .attr("ry", proj.scale()*.25)
+		        .attr("class", "noclicks")
+		        .style("fill", "url(#drop_shadow)");
+
+		    svg.append("circle")
+		        .attr("cx", width / 2).attr("cy", height / 2)
+		        .attr("r", proj.scale())
+		        .attr("class", "noclicks")
+		        .style("fill", "url(#ocean_fill)");
+
+		    svg.append("path")
+		        .datum(graticule)
+		        .attr("class", "graticule noclicks")
+		        .attr("d", path);
+
+		    svg.append("circle")
+		        .attr("cx", width / 2).attr("cy", height / 2)
+		        .attr("r", proj.scale())
+		        .attr("class","noclicks")
+		        .style("fill", "url(#globe_highlight)");
+
+		    svg.append("circle")
+		        .attr("cx", width / 2).attr("cy", height / 2)
+		        .attr("r", proj.scale())
+		        .attr("class","noclicks")
+		        .style("fill", "url(#globe_shading)");
+		    // End of world building
+
+		    // uncomment for hover-able country outlines
+		    svg.append("g").attr("class","countries")
+		      .selectAll("path")
+		        .data(topojson.object(world, world.objects.countries).geometries)
+		      .enter().append("path")
+		        .attr("d", path);
+
+		    // End of world set up -- also the end of cody modified from the above sources
+
+		    // Beginning of adding and plotting data as a choropleth
+			plot_countries (world, bilData, countryCodes, "All"); 
+
+		    
+		    // uncomment the following code to use buttons instead of the dropdown
+		    // d3.select("#buttons").selectAll("input").data(industries).enter().append("input").attr("type","button").attr("class","button").attr("id", function (d) {return d;}).attr("value", function (d) {return d;} )
+
+			// d3.selectAll(".button").on("click", function(){
+			//     plot_countries(world, bilData, countryCodes, this.id);
+			// });  
+
+		    // create a dropdown
+		    var select = d3.select("#menu")
+		                .append("select")
+		                .attr("id","dropdown")
+		                .on("change", function() { plot_countries(world, bilData, countryCodes, this.value); });
+		                // adds the options
+		                select.selectAll("option")
+		                .data(industries)
+		                .enter().append("option")
+		                .attr("value", function(d) { return d;})
+		                .text(function(d) { return d; });
+
+		} 
 
 
-	// creating dictionary where key is country id number and value is the number of billionaires
-    if (industryFilter == "All") {
-	    bilData.forEach(function (person) {
-    		var key = codeDict[person.country];
-    		dict[key] = 0;
-	    })
-	    bilData.forEach(function (person) {
-    		var key = codeDict[person.country];
-    		dict[key]++;
-	    })
-    }else{
-    	bilData.forEach(function (person) {
-	    	if (person.source == industryFilter) {
-	    		var key = codeDict[person.country];
-	    		dict[key] = 0;
-	    	}
-	    	
-	    })
-	    bilData.forEach(function (person) {
-	    	if (person.source == industryFilter) {
-	    		var key = codeDict[person.country];
-	    		dict[key]++;
-	    	}
-	    })
-    }
-    var max = Math.log(d3.max(d3.values(dict)));
+		function plot_countries (world, bilData, countryCodes, industryFilter) {
+			// creating the choropleth coloring
+		    // bilData comes from data.csv, has country codes as 'country'
+		    // can match this code to countries.csv 'code' and then to 'id', which matches the map
+		    d3.selectAll("path").remove();
+
+		    svg.append("path")
+		        .datum(graticule)
+		        .attr("class", "graticule noclicks")
+		        .attr("d", path);
+
+			// creating a dictionary with the key being country 3-letter code and value is id number
+		    var codeDict = {};
+		    // creating dictionary with key 3-letter code and value country name
+		    var nameDict = {}; 
+		    countryCodes.forEach(function (country) {
+		    	codeDict[country.code] = Number(country.id);
+		    	nameDict[country.id] = country.name;
+		    })
+
+		    var dict = {};
+		    var countries = topojson.object(world, world.objects.countries).geometries;
+		    var countryPaths = svg.append('g');
+		    countryPaths.selectAll("path").data(countries).enter()
+			.append("path")
+			.attr("d", path);
+		    svg.append("g").attr("class","countries")
+		      	.selectAll("path")
+		        .data(topojson.object(world, world.objects.countries).geometries)
+		      	.enter().append("path")
+		        .attr("d", path)
+		        .on("click", function (d) {
+		        	var value = dict[d.id];
+		        	if (value == undefined) { value = 0;}
+		        	console.log(nameDict[d.id] + ", " + value);
+		        	document.getElementById("country_selected").innerHTML = nameDict[d.id];
+		        	document.getElementById("number_billionaires").innerHTML = value;
+		        	d3.select("#country_selected").attr("innerHTML", nameDict[d.id]);
+		        	d3.select("#number_billionaires").attr("innerHTML", value);
+		        	return d.id;
+		        });
 
 
-	var fillScale = d3.scale.linear().domain([0,max/3]).range([ "#fff", "#9ACD32"]);
-    countryPaths.selectAll("path")
-		.style("fill", function (country) {
-			var countryName = country.id;
-			var value = dict[countryName];
-			if(!value) return fillScale(Math.log(0));
-			return fillScale(Math.log(value));
-		}).attr("opacity", 0.75).attr("class", "country")
-}
+			// creating dictionary where key is country id number and value is the number of billionaires
+		    if (industryFilter == "All") {
+			    bilData.forEach(function (person) {
+		    		var key = codeDict[person.country];
+		    		dict[key] = 0;
+			    })
+			    bilData.forEach(function (person) {
+		    		var key = codeDict[person.country];
+		    		dict[key]++;
+			    })
+		    }else{
+		    	bilData.forEach(function (person) {
+			    	if (person.source == industryFilter) {
+			    		var key = codeDict[person.country];
+			    		dict[key] = 0;
+			    	}
+			    	
+			    })
+			    bilData.forEach(function (person) {
+			    	if (person.source == industryFilter) {
+			    		var key = codeDict[person.country];
+			    		dict[key]++;
+			    	}
+			    })
+		    }
+		    var max = Math.log(d3.max(d3.values(dict)));
 
 
-function position_labels() {
- 	var centerPos = proj.invert([width/2,height/2]);
-  	var arc = d3.geo.greatArc(); 
-}
+			var fillScale = d3.scale.linear().domain([0,max/3]).range([ "#fff", "#9ACD32"]);
+		    countryPaths.selectAll("path")
+				.style("fill", function (country) {
+					var countryName = country.id;
+					var value = dict[countryName];
+					if(!value) return fillScale(Math.log(0));
+					return fillScale(Math.log(value));
+				}).attr("opacity", 0.75).attr("class", "country")
+		}
 
-// modified from http://bl.ocks.org/1392560
-var m0, o0;
-function mousedown() {
- 	m0 = [d3.event.pageX, d3.event.pageY];
- 	o0 = proj.rotate();
- 	d3.event.preventDefault();
-}
 
-function mousemove() {
-  	if (m0) {
-    	var m1 = [d3.event.pageX, d3.event.pageY]
-    	, o1 = [o0[0] + (m1[0] - m0[0]) / 6, o0[1] + (m0[1] - m1[1]) / 6];
-    	o1[1] = o1[1] > 30  ? 30  :
-            o1[1] < -30 ? -30 :
-            o1[1];
-    	proj.rotate(o1);
-    	refresh();
-  	}
-}
+		function position_labels() {
+		 	var centerPos = proj.invert([width/2,height/2]);
+		  	var arc = d3.geo.greatArc(); 
+		}
 
-function mouseup() {
-  	if (m0) {
-    	mousemove();
-    	m0 = null;
-  	}
-}
+		// modified from http://bl.ocks.org/1392560
+		var m0, o0;
+		function mousedown() {
+		 	m0 = [d3.event.pageX, d3.event.pageY];
+		 	o0 = proj.rotate();
+		 	d3.event.preventDefault();
+		}
 
-function refresh() {
-  	svg.selectAll(".land").attr("d", path);
-  	svg.selectAll("path").attr("d", path);
-  	svg.selectAll(".graticule").attr("d", path);
-  	svg.selectAll(".point").attr("d", path);
-  	position_labels();
-}
+		function mousemove() {
+		  	if (m0) {
+		    	var m1 = [d3.event.pageX, d3.event.pageY]
+		    	, o1 = [o0[0] + (m1[0] - m0[0]) / 6, o0[1] + (m0[1] - m1[1]) / 6];
+		    	o1[1] = o1[1] > 30  ? 30  :
+		            o1[1] < -30 ? -30 :
+		            o1[1];
+		    	proj.rotate(o1);
+		    	refresh();
+		  	}
+		}
 
+		function mouseup() {
+		  	if (m0) {
+		    	mousemove();
+		    	m0 = null;
+		  	}
+		}
+
+		function refresh() {
+		  	svg.selectAll(".land").attr("d", path);
+		  	svg.selectAll("path").attr("d", path);
+		  	svg.selectAll(".graticule").attr("d", path);
+		  	svg.selectAll(".point").attr("d", path);
+		  	position_labels();
+		}
+	}
+</script>
+
+<!-- make the college plot -->
+<script>
+	makeCollege();
+	window.addEventListener('resize', function(){makeCollege()})
+	function makeCollege() {
+		console.log("ran");
+		var data = {
+		  labels: [
+		    'UPenn', 'Harvard', 'Yale',
+		    'USC', 'Cornell', 'Princeton','Stanford', 'UC Berkeley ', 'U of Mumbai',
+		    'LSE', 'Lomonosov', 'Dartmouth', 'U Mich', 'U of Texas', 'Duke', 'NYU', 'Brown', 'Columbia', 'MIT', 'Eth Zurich'
+		  ],
+		  series: [
+		    {
+		      label: 'number of billionaires',
+		      values: [25, 22, 20, 16, 14, 14, 14, 12, 12, 11, 11, 10, 10, 10, 9, 9, 8, 8, 7, 6]
+		    }
+		    ]
+		};
+
+		var chartWidth = window.innerWidth / 1.5;
+		    barHeight        = 20,
+		    groupHeight      = barHeight * data.series.length,
+		    gapBetweenGroups = 10,
+		    spaceForLabels   = 0,
+		    spaceForLegend   = 200;
+
+		// Zip the series data together (first values, second values, etc.)
+		var zippedData = [];
+		for (var i=0; i<data.labels.length; i++) {
+		  for (var j=0; j<data.series.length; j++) {
+		    zippedData.push(data.series[j].values[i]);
+		  }
+		}
+
+		// Color scale
+		var color = d3.scale.category20();
+		var chartHeight = barHeight * zippedData.length + gapBetweenGroups * data.labels.length;
+
+		var x = d3.scale.linear()
+		    .domain([0, d3.max(zippedData)])
+		    .range([0, chartWidth]);
+
+		var y = d3.scale.linear()
+		    .range([chartHeight + gapBetweenGroups, 0]);
+
+		var yAxis = d3.svg.axis()
+		    .scale(y)
+		    .tickFormat('')
+		    .tickSize(0)
+		    .orient("left");
+
+		// Specify the chart area and dimensions
+		var chart = d3.select(".chart")
+		    .attr("width", spaceForLabels + chartWidth + spaceForLegend)
+		    .attr("height", chartHeight);
+
+		chart.selectAll("*").remove();
+
+		// Create bars
+		var bar = chart.selectAll("g")
+		    .data(zippedData)
+		    .enter().append("g")
+		    .attr("transform", function(d, i) {
+		      return "translate(" + spaceForLabels + "," + (i * barHeight + gapBetweenGroups * (0.5 + Math.floor(i/data.series.length))) + ")";
+		    });
+
+		// Create rectangles of the correct width
+		bar.append("rect")
+		    .attr("fill", function(d,i) { return color(i % data.series.length); })
+		    .attr("class", "bar")
+		    .attr("width", x)
+		    .attr("height", barHeight - 1)
+		    .attr("opacity", 1)
+		    // .on("click",function(d,i){
+		    //       d3.select(this)
+		    //           .attr("fill","green");
+		    //     })
+		    // .on("mouseout",function(d,i){
+		    //       d3.select(this)
+		    //           .attr("fill","steelblue");
+		    //     })
+		   	;
+
+		// Add text label in bar
+		bar.append("text")
+		    .attr("x", function(d) { return x(d) - 3; })
+		    .attr("y", barHeight / 2)
+		    .attr("fill", "red")
+		    .attr("dy", ".35em")
+		    .text(function(d) { return d; })
+		    .style("text-anchor", "left");
+
+		// Draw labels
+		bar.append("text")
+		    .attr("class", "label")
+		    .attr("x", function(d) { return  5; })
+		    .attr("y", groupHeight / 2)
+		    .attr("dy", ".35em")
+		    .text(function(d,i) {
+		      if (i % data.series.length === 0)
+		        return data.labels[Math.floor(i/data.series.length)];
+		      else
+		        return ""})
+		    .style("text-anchor", "start");
+
+		chart.append("g")
+		      .attr("class", "y axis")
+		      .attr("transform", "translate(" + spaceForLabels + ", " + -gapBetweenGroups/2 + ")")
+		      .call(yAxis);
+
+		// Draw legend
+		var legendRectSize = 18,
+		    legendSpacing  = 4;
+
+		var legend = chart.selectAll('.legend')
+		    .data(data.series)
+		    .enter()
+		    .append('g')
+		    .attr('transform', function (d, i) {
+		        var height = legendRectSize + legendSpacing;
+		        var offset = -gapBetweenGroups/2;
+		        var horz = spaceForLabels + chartWidth + 40 - legendRectSize;
+		        var vert = i * height - offset;
+		        return 'translate(' + horz + ',' + vert + ')';
+		    });
+
+		legend.append('rect')
+		    .attr('width', legendRectSize)
+		    .attr('height', legendRectSize)
+		    .style('fill', function (d, i) { return color(i); })
+		    .style('stroke', function (d, i) { return color(i); });
+
+		legend.append('text')
+		    .attr('class', 'legend')
+		    .attr('x', legendRectSize + legendSpacing)
+		    .attr('y', legendRectSize - legendSpacing)
+		    .text(function (d) { return d.label; });
+	}
 </script>
