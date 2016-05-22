@@ -23,7 +23,7 @@ body div {
 }
 
 .spacer {
-	margin: 0 auto;
+	margin: 30px auto;
 	border: 1px solid lightgray;
 	width: 50%;
 }
@@ -61,37 +61,37 @@ svg {
 }
 
 .land {
- 	/*fill: rgb(117, 87, 57);*/
-  	stroke-opacity: 1;
+  /*fill: rgb(117, 87, 57);*/
+  stroke-opacity: 1;
 }
 
 .countries path {
-  	stroke: rgb(80, 64, 39);  
-  	stroke-linejoin: round;
-  	stroke-width: 1;
-  	/*fill: rgb(117, 87, 57);*/
-  	opacity: 0.1;
+ stroke: rgb(80, 64, 39);  
+ stroke-linejoin: round;
+ stroke-width: 1;
+ /*fill: rgb(117, 87, 57);*/
+ opacity: 0.1;
 }
 
 .graticule {
-  	fill: none;
-  	stroke: black;
-  	stroke-width: 0.5;
-  	opacity: 0.2;
+ fill: none;
+ stroke: black;
+ stroke-width: 0.5;
+ opacity: 0.2;
 }
 
 .labels {
-    font: 8px sans-serif;
-    fill: black;
-    opacity: .5;
+  font: 8px sans-serif;
+  fill: black;
+  opacity: .5;
 }
 
 .noclicks {
-  	pointer-events:none;
+ pointer-events:none;
 }
 
 .point{
-  	opacity:.6;
+ opacity:.6;
 }
 
 /**/
@@ -129,10 +129,112 @@ svg {
 }
 
 /**/
+/*For middle visualizations*/
+/**/
+
+.cir{
+  opacity:0.4;
+  stroke: black;
+  stroke-opacity: 0.2;
+}
+.text_name{
+  color:black;
+}
+.tip {
+  line-height: 1;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+/* Creates a small triangle extender for the tooltip */
+.tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.tile {
+  shape-rendering: crispEdges;
+}
+
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.axis2 path,
+.axis2 line {
+  fill: none;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.axis3 path,
+.axis3 text {
+  fill: none;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.svg2 {
+  margin: 5px;
+}
+#chart2{
+  margin: 5px;
+}
+
+#chart2_2 {
+  margin: 5px;
+}
+
+.legend1 {
+  opacity:0.8;
+  font-size: 10px;
+}
+
+.svg2{
+  margin-top:75px;
+}
+.title1{
+  font-size: 20px;
+}
+.imgman{
+  height:25px;
+  width:25px;
+}
+
+
+/**/
 /*Footer styling*/
 /**/
 
 #footer {
 	font-size: 0.8em;
 	float: bottom;
+}
+
+@media (max-width: 720px) {
+  body * :not(svg text) {
+    font-size: 1.2em;
+  }
 }
