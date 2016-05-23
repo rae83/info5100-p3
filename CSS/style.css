@@ -12,6 +12,12 @@ body div {
 	margin-top: 2%;
 }
 
+#title-em {
+  background-image: -webkit-gradient(linear, 0 0, 0 bottom, from(rgba(0, 128, 0, 1)), to(rgba(255, 242, 200, 1)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
 .emphasized {
 	font-weight: bolder;
 	color: green;
@@ -25,7 +31,7 @@ body div {
 .spacer {
 	margin: 30px auto;
 	border: 1px solid lightgray;
-	width: 50%;
+	width: 60%;
 }
 
 #globe, #menu {

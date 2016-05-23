@@ -14,7 +14,7 @@
 	<!-- intro and globe -->
 		<!-- <div class="row"> -->
 			<div class="" id="title">
-				<h1> So you want to be a <span class="emphasized">billionaire?</span></h1>
+				<h1> So you want to be a <span id="title-em" class="emphasized">billionaire?</span></h1>
 			</div>
 			<div class ="" id="paragraph">
 				<p>In 2014, there were <span class="emphasized">1,645 billionaires</span> in the world.  Together, these individuals represent a net worth of more than $6.4 trillion. </p>
@@ -44,6 +44,7 @@
 	<div class="spacer"></div>
 
 	<!-- begin center visualizations -->
+		<h4>Where should you work?</h4>
 		<div class="row">
 		  	<div class="seven columns" id = "filter">
 		  		<h5>Choose up to three different industries to compare: </h5>
@@ -218,6 +219,7 @@
 
 	<!-- begin college plot -->
 		<div id="college-text">
+			<h4>Where should you go to school?</h4>
 			<p>Although many billionaires are famous for being college dropouts, going to a top-notch school is still a great step in the direction towards becoming a billionaire.  After all, <span class="emphasized">44.8% of American billionaires attended one of the top-rank schools</span> listed below.</p>
 		</div>
 		<svg class="chart"></svg>
@@ -742,8 +744,6 @@
 			    .on('mouseout', tip.hide);
 
 
-
-
 			    // ------- end draw  circle plot --------///
 
 
@@ -901,7 +901,6 @@
 		      	// .attr("y", 10)
 		      	// .attr("dy", ".35em")
 		      	// .text("Count");
-
 
 			    // -------  end draw the x y axis for the heat plot --------///
 
@@ -1178,8 +1177,6 @@
 		  }
 		}
 
-		// Color scale
-		var color = d3.scale.category20();
 		var chartHeight = barHeight * zippedData.length + gapBetweenGroups * data.labels.length;
 
 		var x = d3.scale.linear()
@@ -1212,7 +1209,8 @@
 
 		// Create rectangles of the correct width
 		bar.append("rect")
-		    .attr("fill", function(d,i) { return color(i % data.series.length); })
+		    .style("fill", "#517693")
+		    .style("opacity", 0.8)
 		    .attr("class", "bar")
 		    .attr("width", x)
 		    .attr("height", barHeight - 1)
