@@ -414,7 +414,7 @@
 		        .on("touchstart", function (d) {
 		        	var value = dict[d.id];
 		        	if (value == undefined) { value = 0;}
-		        	console.log(nameDict[d.id] + ", " + value);
+		        	// console.log(nameDict[d.id] + ", " + value);
 		        	document.getElementById("country_selected").innerHTML = nameDict[d.id];
 		        	document.getElementById("number_billionaires").innerHTML = value;
 		        	d3.select("#country_selected").attr("innerHTML", nameDict[d.id]);
@@ -423,7 +423,7 @@
 		        .on("click", function (d) {
 		        	var value = dict[d.id];
 		        	if (value == undefined) { value = 0;}
-		        	console.log(nameDict[d.id] + ", " + value);
+		        	// console.log(nameDict[d.id] + ", " + value);
 		        	document.getElementById("country_selected").innerHTML = nameDict[d.id];
 		        	document.getElementById("number_billionaires").innerHTML = value;
 		        	d3.select("#country_selected").attr("innerHTML", nameDict[d.id]);
@@ -491,13 +491,22 @@
 
 		function mousemove() {
 			// console.log("mousemove ran");
-			var touch = event.targetTouches[0];
+			if (event.targetTouches != undefined) {
+				var touch = event.targetTouches[0];	
+			}
 		  	if (m0) {
 		    	var m1 = [d3.event.pageX, d3.event.pageY];
 		    	if (m1[0] == undefined) {
-		    		m1 = [touch.pageX, touch.pageY];
-		    		// console.log(m1[0], m1[1]);
+		    		if (touch != undefined) {
+		    			m1 = [touch.pageX, touch.pageY];
+		    		}else{
+		    			m1 = [event.changedTouches[0].pageX, event.changedTouches[0].pageY];
+		    		}
 		    	}
+		    	// console.log(o0);
+		    	// console.log(m0);
+		    	// console.log(m1);
+		    	// console.log('-----');
 		    	var o1 = [o0[0] + (m1[0] - m0[0]) / 6, o0[1] + (m0[1] - m1[1]) / 6];
 		    	o1[1] = o1[1] > 30  ? 30  :
 		            o1[1] < -30 ? -30 :
@@ -626,7 +635,7 @@ function makePlots() {
 
     	//the lengend here
     	svg.append("text")
-	    .text("Net worth by industry")
+	    .text("Net worth by industry (in $B)")
 	    .attr("x", width/2 - 75)
 	    .attr("y", 50)
 	    .attr("class","title1");
@@ -732,7 +741,7 @@ function makePlots() {
 		    svg.append("svg:image")
 		    .data(pickedpeople)
 		    .attr("xlink:href",function(d){
-		      console.log(d.picture);
+		      // console.log(d.picture);
 		      return d.picture;
 		    }).attr("x",function(d,i){ return xScale(d.source) + 30 + d3.round(Math.random()*30);})
 		    .attr("y",function(d,i){ return yScale(d.net_worth);})
