@@ -555,7 +555,7 @@ function makePlots() {
 	var people;
 	var height = 700;
 	var width;
-	if (window.innerWidth < 615) {
+	if (window.innerWidth < 620) {
 		width = window.innerWidth - 100;
 	}else{
 		width = window.innerWidth / 2;
@@ -845,8 +845,8 @@ function makePlots() {
 		    var xAxis_2 = d3.svg.axis().scale(xScale_2).orient("bottom");
 		    var yAxis_2 = d3.svg.axis().scale(yScale_2).orient("left");
 
-		    svg_2.append("g").attr("transform", "translate(0," + (height2 - padding)+ ")").attr("class", "Xaxis2 axis2")
-		    .call(xAxis_2).selectAll("text").attr("transform","rotate(-10) translate(0, 10)");;
+		    svg_2.append("g").attr("transform", "translate(0," + (height2 - padding)+ ")").attr("class", "Xaxis2 axis2 heatmap_text")
+		    .call(xAxis_2).selectAll("text").attr("transform","rotate(-10) translate(0, 10)");
 
 		    svg_2.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis3")
 		    .call(yAxis_2);
@@ -854,17 +854,22 @@ function makePlots() {
 		    //append the text label mannually
 		    svg_2.append("text").attr("class","axis2")
 		    .attr("x",5)
-		    .attr("y",130)
-		    .text("Net worth");
+		    .attr("y",120)
+		    .text("Cumulative");
 
 		    svg_2.append("text").attr("class","axis2")
 		    .attr("x",5)
-		    .attr("y",170)
+		    .attr("y",140)
+		    .text("net worth");
+
+		    svg_2.append("text").attr("class","axis2")
+		    .attr("x",5)
+		    .attr("y",180)
 		    .text("Number of");
 
 		    svg_2.append("text").attr("class","axis2")
 		    .attr("x",5)
-		    .attr("y",190)
+		    .attr("y",200)
 		    .text("billionaires");
 
 		    svg_2.selectAll(".tile")
