@@ -480,9 +480,9 @@
 		var m0, o0;
 		function mousedown() {
 			// console.log("mousedown ran");
-			var touch = event.targetTouches[0];
 		 	m0 = [d3.event.pageX, d3.event.pageY];
 		 	if (m0[0] == undefined) {
+		 		var touch = event.targetTouches[0];
 		 		m0 = [touch.pageX, touch.pageY];
 		 	}
 		 	o0 = proj.rotate();
