@@ -17,16 +17,18 @@
 				<h1> So you want to be a <span class="emphasized">billionaire?</span></h1>
 			</div>
 			<div class ="" id="paragraph">
-				<p>In 2014, there were <span class="emphasized">1,645 billionaires</span> in the world.  Together, these individuals represent a net worth of more than $6.4 trillion.  Rotate the globe below to see where billionaires live around the world.  You can filter the data by industry and click the map to see the country selected and the number of billionaires from the country in question.</p>
+				<p>In 2014, there were <span class="emphasized">1,645 billionaires</span> in the world.  Together, these individuals represent a net worth of more than $6.4 trillion. </p>
+				<p>Rotate the globe below to see where billionaires live around the world.  You can filter the data by industry and click the map to see the country selected and the number of billionaires from the country in question.</p>
 			</div>
 		<!-- </div> -->
 
 		<div class="spacer"></div>
 
-		<div id='buttons'></div>
 		<div class="row">
 			<div class="six columns" id="globe"></div>
 			<div class="six columns" id="right-side">
+				<h4>Where should you live?</h4>
+				<p>Choose a sector from the menu below to see how billionaires from that industry are distributed around the world.</p>
 				<div id='menu'></div>
 				<div id="outputs">
 					<p class="emphasized">Country selected:</p>
@@ -42,7 +44,6 @@
 	<div class="spacer"></div>
 
 	<!-- begin center visualizations -->
-		
 		<div class="row">
 		  	<div class="seven columns" id = "filter">
 		  		<h5>Choose up to three different industries to compare: </h5>
@@ -357,14 +358,6 @@
 		    // Beginning of adding and plotting data as a choropleth
 			plot_countries (world, bilData, countryCodes, "All"); 
 
-		    
-		    // uncomment the following code to use buttons instead of the dropdown
-		    // d3.select("#buttons").selectAll("input").data(industries).enter().append("input").attr("type","button").attr("class","button").attr("id", function (d) {return d;}).attr("value", function (d) {return d;} )
-
-			// d3.selectAll(".button").on("click", function(){
-			//     plot_countries(world, bilData, countryCodes, this.id);
-			// });  
-
 		    // create a dropdown
 		    var select = d3.select("#menu")
 		                .append("select")
@@ -535,144 +528,10 @@
 
 <!-- make the center visualizations -->
 <script>
-makePlots();
-window.addEventListener('resize', function(){makePlots()})
-function makePlots() {
-	d3.selectAll(".cir").remove();
-	  	d3.selectAll(".Xaxis").remove();
-	  	d3.selectAll(".tile").remove();
-	  	d3.selectAll(".Xaxis2").remove();
-	  	d3.selectAll(".axis2").remove();
-	  	d3.selectAll(".legend").remove();
-	  	d3.selectAll(".imgman").remove();
-	  	d3.selectAll(".yaxis").remove();
-	  	d3.selectAll(".imgman").remove();
-	  	d3.selectAll(".legend1").remove();
-	  	d3.selectAll(".axis1").remove();
-	  	d3.selectAll(".svg2").remove();
-
-	var datas;
-	var people;
-	var height = 700;
-	var width;
-	if (window.innerWidth < 620) {
-		width = window.innerWidth - 100;
-	}else{
-		width = window.innerWidth / 2;
-	}
-	var height2 = 300;
-	var width2 = 400;
-	var padding;
-	var industry;
-	var country;
-	var age;
-	var pickedpeople;
-	var newdata;
-	var xScale, xScale_2;
-	var yScale, yScale_2,z;
-	var heatdata;
-
-
-
-	d3.csv("data/data.csv", function (error, data) {
-	  //prepare the data for use
-	  	people = data.map(function (entrys) {
-	    	return { 
-	     		name: entrys.name,
-	     		net_worth: entrys.net_worth,
-	     		age: entrys.age,
-	     		country:entrys.country,
-	     		rank: entrys.rank,
-	     		source:entrys.source,
-	     		picture:entrys.picture
-	   		};
-	 	})
-	  	.filter(function (entrys) {
-	    	return (entrys.age != undefined) && (entrys.source != undefined)
-	  	});;
-
-	  	var svg = d3.select("#chart2").append("svg").attr("height", height).attr("width", width).attr("class", "svg2");
-
-	  	var svg_2 = d3.select("#chart2_2").append("svg").attr("height", height2).attr("width", width2).attr("class","svg2");
-
-	  	d3.selectAll(".svg2 *").remove();
-
-	  	// popup for circle plot;
-	  	var tip = d3.tip()
-	  	.attr('class', 'tip')
-	  	.offset([-10, 0])
-	  	.html(function(d) {
-	    	return "rank:  " + d.rank + "</span>" + "<br/>" + "name: " + d.name + "</span>" + "<br/>" +"net worth: " + d.net_worth + "</span>" + "<br/>" + "age: " + d.age + "</span>";
-	  	});
-
-	  	svg.call(tip);
-
-	  	var tip2 = d3.tip()
-	 	.attr('class', 'tip')
-	  	.offset([-10, 0])
-	  	.html(function(d) {
-	    	if(d.date == "net worth" ) return  "" + "total net worth for the industry: " + d.count + "</span>";
-	    	else return "<span>" + "total number of billionaries in the industry: " + d.count + "</span>";
-	  	});
-
-	  	svg_2.call(tip2);
-
-	  	repaint();
-
-
-	  	// d3.select("#changebutton").on("click", function () {
-	  	//   repaint();
-	  	//   });
-		d3.select("#industry1").on("change", function () {
-	  		repaint();
-		});
-		d3.select("#industry2").on("change", function () {
-	  		repaint();
-		});
-		d3.select("#industry3").on("change", function () {
-	  		repaint();
-		});
-
-    	//the lengend here
-    	svg.append("text")
-	    .text("Net worth by industry (in $B)")
-	    .attr("x", width/2 - 75)
-	    .attr("y", 50)
-	    .attr("class","title1");
-
-	    // svg.append("circle")
-	    // .attr("class","legend1")
-	    // .attr("cx", width-250)
-	    // .attr("cy", 75)
-	    // .attr("r",4)
-	    // .style("fill","#CCFF99");
-
-	    // svg.append("text")
-	    // .attr("x", width-240)
-	    // .attr("y", 80)
-	    // .attr("class","legend1")
-	    // .text("top 5 billionaires in industry");
-
-	    svg.append("circle")
-	    .attr("cx", width-250)
-	    .attr("cy", 90)
-	    .attr("r",4)
-	    .attr("class","legend1")
-	    .style("fill","black");
-
-	    svg.append("text")
-	    .attr("x", width-240)
-	    .attr("y", 95)
-	    .attr("class","legend1")
-	    .text("billionaire in industry");
-
-  		// var Ytext = ["Automotive","Business","Construction & Engineering","Diversified","Energy","Fashion and Retail","Finance","Food and Beverage","Gaming","Health care","Investments","Logistics","Manufacturing","Media","Medicine","Metals & Mining","Oil","Politics","Real Estate","Retail","Service","Sports","Technology","Telecom"];
-
-
-  		// paint the dot on the graph
-	  	function repaint(){
-		  	// -------draw  circle plot first time --------///
-		  	d3.selectAll(".cir").remove();
+	makePlots();
+	window.addEventListener('resize', function(){makePlots()})
+	function makePlots() {
+		d3.selectAll(".cir").remove();
 		  	d3.selectAll(".Xaxis").remove();
 		  	d3.selectAll(".tile").remove();
 		  	d3.selectAll(".Xaxis2").remove();
@@ -681,474 +540,607 @@ function makePlots() {
 		  	d3.selectAll(".imgman").remove();
 		  	d3.selectAll(".yaxis").remove();
 		  	d3.selectAll(".imgman").remove();
+		  	d3.selectAll(".legend1").remove();
+		  	d3.selectAll(".axis1").remove();
+		  	d3.selectAll(".svg2").remove();
+
+		var datas;
+		var people;
+		var height = 700;
+		var width;
+		if (window.innerWidth < 620) {
+			width = window.innerWidth - 50;
+		}else{
+			width = window.innerWidth / 2;
+		}
+		var height2 = 300;
+		var width2 = 400;
+		var padding = 50;
+		var industry;
+		var country;
+		var age;
+		var pickedpeople;
+		var newdata;
+		var xScale, xScale_2;
+		var yScale, yScale_2,z;
+		var heatdata;
 
 
-		  	padding = 100;
 
-		  	var industry1 = document.getElementById("industry1").value;
-		  	var industry2 = document.getElementById("industry2").value;
-		  	var industry3 = document.getElementById("industry3").value;
+		d3.csv("data/data.csv", function (error, data) {
+		  //prepare the data for use
+		  	people = data.map(function (entrys) {
+		    	return { 
+		     		name: entrys.name,
+		     		net_worth: entrys.net_worth,
+		     		age: entrys.age,
+		     		country:entrys.country,
+		     		rank: entrys.rank,
+		     		source:entrys.source,
+		     		picture:entrys.picture
+		   		};
+		 	})
+		  	.filter(function (entrys) {
+		    	return (entrys.age != undefined) && (entrys.source != undefined)
+		  	});;
 
+		  	var svg = d3.select("#chart2").append("svg").attr("height", height).attr("width", width).attr("class", "svg2");
 
-		  	var Xtext = [];
-		  	Xtext.push(industry1);
-		  	Xtext.push(industry2);
-		  	Xtext.push(industry3);
+		  	var svg_2 = d3.select("#chart2_2").append("svg").attr("height", height2).attr("width", width2).attr("class","svg2");
 
-		  	pickedpeople = people.filter(function (p) {
-		    	return p.source == industry1 || p.source == industry2 || p.source == industry3;
+		  	d3.selectAll(".svg2 *").remove();
+
+		  	// popup for circle plot;
+		  	var tip = d3.tip()
+		  	.attr('class', 'tip')
+		  	.offset([-10, 0])
+		  	.html(function(d) {
+		    	return "rank:  " + d.rank + "</span>" + "<br/>" + "name: " + d.name + "</span>" + "<br/>" +"net worth: " + d.net_worth + "</span>" + "<br/>" + "age: " + d.age + "</span>";
 		  	});
 
-		    //console.log(pickedpeople);
+		  	svg.call(tip);
 
-		    yScale = d3.scale.linear()
-		    .domain([0,76])
-		    .range([height - padding, padding]);
-		    xScale = d3.scale.ordinal().domain(Xtext).rangeBands([padding, width - padding/2],0.3,0.1);
+		  	var tip2 = d3.tip()
+		 	.attr('class', 'tip')
+		  	.offset([-10, 0])
+		  	.html(function(d) {
+		    	if(d.date == "net worth" ) return  "" + "total net worth for the industry: " + d.count + "</span>";
+		    	else return "<span>" + "total number of billionaries in the industry: " + d.count + "</span>";
+		  	});
 
-		    var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
-		    var yAxis = d3.svg.axis().scale(yScale).orient("left");
+		  	svg_2.call(tip2);
 
-		    svg.append("g").attr("transform", "translate(0," + (height - padding)+ ")").attr("class", "Xaxis axis")
-		    .call(xAxis).selectAll("text").attr("transform","rotate(-10) translate(0, 10)");
+		  	repaint();
 
-		    svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "yaxis axis")
-		    .call(yAxis);
 
-		    svg.selectAll('.cir')
-		    .data(pickedpeople)
-		    .enter().append('circle')
-		    .attr("cx",function(d,i){ 
-		        //console.log(d.picture == "");
-		        if(d.picture != "") return -10;
-		        else return xScale(d.source) + 30 + d3.round(Math.random()*30);;
-		    })
-		    .attr("cy",function(d,i){ 
-		      	if(d.picture != "") return -10;
-		      	else return yScale(d.net_worth);
-		    })
+		  	// d3.select("#changebutton").on("click", function () {
+		  	//   repaint();
+		  	//   });
+			d3.select("#industry1").on("change", function () {
+		  		repaint();
+			});
+			d3.select("#industry2").on("change", function () {
+		  		repaint();
+			});
+			d3.select("#industry3").on("change", function () {
+		  		repaint();
+			});
+
+	    	//the lengend here
+	    	svg.append("text")
+		    .text("Net worth by industry (in $B)")
+		    .attr("x", width/2 - 75)
+		    .attr("y", 50)
+		    .attr("class","title1");
+
+		    // svg.append("circle")
+		    // .attr("class","legend1")
+		    // .attr("cx", width-250)
+		    // .attr("cy", 75)
+		    // .attr("r",4)
+		    // .style("fill","#CCFF99");
+
+		    // svg.append("text")
+		    // .attr("x", width-240)
+		    // .attr("y", 80)
+		    // .attr("class","legend1")
+		    // .text("top 5 billionaires in industry");
+
+		    svg.append("circle")
+		    .attr("cx", width-250)
+		    .attr("cy", 90)
 		    .attr("r",4)
-		    .attr("class","cir")
-		    .style("fill",function(d,i){ 
-		      	if(i <=10 ) return "black";
-		      	else return "black";
-		    })
-		    .on('click', tip.show)
-		    .on('mouseout', tip.hide);
+		    .attr("class","legend1")
+		    .style("fill","black");
 
-		    //try to append a img here
+		    svg.append("text")
+		    .attr("x", width-240)
+		    .attr("y", 95)
+		    .attr("class","legend1")
+		    .text("billionaire in industry");
 
-		    svg.append("svg:image")
-		    .data(pickedpeople)
-		    .attr("xlink:href",function(d){
-		      // console.log(d.picture);
-		      return d.picture;
-		    }).attr("x",function(d,i){ return xScale(d.source) + 30 + d3.round(Math.random()*30);})
-		    .attr("y",function(d,i){ return yScale(d.net_worth);})
-		    .attr("class","imgman")
-		    .on('click', tip.show)
-		    .on('mouseout', tip.hide);
+	  		// var Ytext = ["Automotive","Business","Construction & Engineering","Diversified","Energy","Fashion and Retail","Finance","Food and Beverage","Gaming","Health care","Investments","Logistics","Manufacturing","Media","Medicine","Metals & Mining","Oil","Politics","Real Estate","Retail","Service","Sports","Technology","Telecom"];
 
 
+	  		// paint the dot on the graph
+		  	function repaint(){
+			  	// -------draw  circle plot first time --------///
+			  	d3.selectAll(".cir").remove();
+			  	d3.selectAll(".Xaxis").remove();
+			  	d3.selectAll(".tile").remove();
+			  	d3.selectAll(".Xaxis2").remove();
+			  	d3.selectAll(".axis2").remove();
+			  	d3.selectAll(".legend").remove();
+			  	d3.selectAll(".imgman").remove();
+			  	d3.selectAll(".yaxis").remove();
+			  	d3.selectAll(".imgman").remove();
+
+			  	padding = 100;
+
+			  	var industry1 = document.getElementById("industry1").value;
+			  	var industry2 = document.getElementById("industry2").value;
+			  	var industry3 = document.getElementById("industry3").value;
 
 
-		    // ------- end draw  circle plot --------///
+			  	var Xtext = [];
+			  	Xtext.push(industry1);
+			  	Xtext.push(industry2);
+			  	Xtext.push(industry3);
+
+			  	pickedpeople = people.filter(function (p) {
+			    	return p.source == industry1 || p.source == industry2 || p.source == industry3;
+			  	});
+
+			    //console.log(pickedpeople);
+
+			    yScale = d3.scale.linear()
+			    .domain([0,76])
+			    .range([height - padding, padding]);
+			    xScale = d3.scale.ordinal().domain(Xtext).rangeBands([padding, width - padding/2],0.3,0.1);
+
+			    var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+			    var yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+			    svg.append("g").attr("transform", "translate(0," + (height - padding)+ ")").attr("class", "Xaxis axis")
+			    .call(xAxis).selectAll("text").attr("transform","rotate(-10) translate(0, 10)");
+
+			    svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "yaxis axis")
+			    .call(yAxis);
+
+			    svg.selectAll('.cir')
+			    .data(pickedpeople)
+			    .enter().append('circle')
+			    .attr("cx",function(d,i){ 
+			        //console.log(d.picture == "");
+			        if(d.picture != "") return -10;
+			        else return xScale(d.source) + 30 + d3.round(Math.random()*30);;
+			    })
+			    .attr("cy",function(d,i){ 
+			      	if(d.picture != "") return -10;
+			      	else return yScale(d.net_worth);
+			    })
+			    .attr("r",4)
+			    .attr("class","cir")
+			    .style("fill",function(d,i){ 
+			      	if(i <=10 ) return "black";
+			      	else return "black";
+			    })
+			    .on('click', tip.show)
+			    .on('mouseout', tip.hide);
+
+			    //try to append a img here
+
+			    svg.append("svg:image")
+			    .data(pickedpeople)
+			    .attr("xlink:href",function(d){
+			      // console.log(d.picture);
+			      return d.picture;
+			    }).attr("x",function(d,i){ return xScale(d.source) + 30 + d3.round(Math.random()*30);})
+			    .attr("y",function(d,i){ return yScale(d.net_worth);})
+			    .attr("class","imgman")
+			    .on('click', tip.show)
+			    .on('mouseout', tip.hide);
 
 
 
-		    // ------- draw the x y axis for the heat plot --------///
 
-		    // --------------prepare the data for the heat map  -------------------//
-
-		    //caculate the number of billionaires first
-		    var count1 = 0 ,count2 = 0 , count3 = 0;
-		    for(var i = 0; i < people.length; i++){
-		      	if(people[i].source == industry1) count1++;
-		    }
-		    for(var i2 = 0; i2 < people.length; i2++){
-		      	if(people[i2].source == industry2) count2++;
-		    }
-		    for(var i3 = 0; i3 < people.length; i3++){
-		      	if(people[i3].source == industry3) count3++;
-		    }
-
-		    //calculate the total net worth
-		    var countnet1 = 0; countnet2 = 0; countnet3 = 0;
-		    for(var t = 0; t < people.length; t++){
-		      	if(people[t].source == industry1) 
-		        	countnet1 = countnet1 + Number(people[t].net_worth);
-		    }
-		    for(var t2 = 0; t2 < people.length; t2++){
-		      	if(people[t2].source == industry2) 
-		        	countnet2 = countnet2 + Number(people[t2].net_worth);
-		    }
-		    for(var t3 = 0; t3 < people.length; t3++){
-		      	if(people[t3].source == industry3) countnet3 = countnet3 + Number(people[t3].net_worth);
-		    }
+			    // ------- end draw  circle plot --------///
 
 
-		    // form the data here
-		    heatdata = people.filter(function (entrys) {
-		      	return (entrys.source == industry1) || (entrys.source == industry2) || (entrys.source == industry3);
-		    });
 
-		    var heatdata_net = [{
-		      	date: "net worth",
-		      	bucket: industry1,
-		      	count: countnet1
-		    },
-		    {
-		      	date: "net worth",
-		      	bucket: industry2,
-		      	count: countnet2
-		    },
-		    {
-		      	date: "net worth",
-		      	bucket: industry3,
-		      	count: countnet3
-		    },
-		    {
-		      	date: "number of billionaires",
-		      	bucket: industry1,
-		      	count: count1
-		    },
-		    {
-		      	date: "number of billionaires",
-		      	bucket: industry2,
-		      	count: count2
-		    },
-		    {
-		      	date: "number of billionaires",
-		      	bucket: industry3,
-		      	count: count3
-		    }
-		    ]
+			    // ------- draw the x y axis for the heat plot --------///
 
-		    // console.log(heatdata_net);
+			    // --------------prepare the data for the heat map  -------------------//
 
-			// -------------- end prepare the data for the heat map  -------------------//
-
-		    // draw axis for the heat map //
-
-		    var ytext_2 =["net worth","number of billionaires"];
-
-		    xScale_2= d3.scale.ordinal()
-		    .domain(Xtext)
-		    .rangeBands([padding, width2 - padding],0.3,0.1);
-
-		    yScale_2 = d3.scale.ordinal().domain(ytext_2).rangeBands([padding, height2 - padding],0.3,0.1);
-
-		    z = d3.scale.linear().range(["#CCFF99", "#227700"]);
-		    z.domain([0, d3.max(heatdata_net, function(d) { return d.count; })]);
-
-
-		    var xAxis_2 = d3.svg.axis().scale(xScale_2).orient("bottom");
-		    var yAxis_2 = d3.svg.axis().scale(yScale_2).orient("left");
-
-		    svg_2.append("g").attr("transform", "translate(0," + (height2 - padding)+ ")").attr("class", "Xaxis2 axis2 heatmap_text")
-		    .call(xAxis_2).selectAll("text").attr("transform","rotate(-10) translate(0, 10)");
-
-		    svg_2.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis3")
-		    .call(yAxis_2);
-
-		    //append the text label mannually
-		    svg_2.append("text").attr("class","axis2")
-		    .attr("x",5)
-		    .attr("y",120)
-		    .text("Cumulative");
-
-		    svg_2.append("text").attr("class","axis2")
-		    .attr("x",5)
-		    .attr("y",140)
-		    .text("net worth");
-
-		    svg_2.append("text").attr("class","axis2")
-		    .attr("x",5)
-		    .attr("y",180)
-		    .text("Number of");
-
-		    svg_2.append("text").attr("class","axis2")
-		    .attr("x",5)
-		    .attr("y",200)
-		    .text("billionaires");
-
-		    svg_2.selectAll(".tile")
-		    .data(heatdata_net)
-		    .enter().append("rect")
-		    .attr("class", "tile")
-		    .attr("x", function(d) { return xScale_2(d.bucket); })
-		    .attr("y", function(d) { return yScale_2(d.date);   })
-		    .attr("width", 80)
-		    .attr("height",  100)
-		    .style("stroke", "white")
-		    .style("fill", function(d) { return z(d.count); })
-		    .on('click', tip2.show)
-		    .on('mouseout', tip2.hide);
-
-	      	// Add a legend for the color values.
-	      	var legend = svg_2.selectAll(".legend") 
-	      	.data(z.ticks(6).slice(1).reverse())
-	      	.enter().append("g")
-	      	.attr("class", "legend")
-	      	.attr("transform", function(d, i) { return "translate(" + (width - 350 + i * 50) + "," + (30) + ")"; });
-
-	      	legend.append("rect")
-	      	.attr("width", 50)
-	      	.attr("height", 30)
-	      	.style("fill", z);
-
-	      	legend.append("text")
-	      	.attr("x", 5)
-	      	.attr("y", 40)
-	      	.attr("dy", ".35em")
-	      	.text(String);
-
-	      	// svg.append("text")
-	      	// .attr("class", "label")
-	      	// .attr("x", width + 20)
-	      	// .attr("y", 10)
-	      	// .attr("dy", ".35em")
-	      	// .text("Count");
-
-
-		    // -------  end draw the x y axis for the heat plot --------///
-
-		    //in case the country or age change so update it too;
-		    refreshdata();
-		} // end of the repaint function
-
-	    // code of filter here:
-
-	    d3.select("#country").on("change", function () {
-	    	refreshdata();
-	    });
-	    d3.select("#age").on("change", function () {
-	    	refreshdata();
-	    });
-
-
-	    function refreshdata(){
-
-		    //filter the data for both part;
-		    d3.selectAll(".cir").remove();
-		    d3.selectAll(".tile").remove();
-		    d3.selectAll(".legend").remove();
-		    d3.selectAll(".imgman").remove();
-
-		    country = document.getElementById("country").value;
-		    age = document.getElementById("age").value;
-
-
-		    newdata = pickedpeople.filter(function(p){
-		      	if(country == "all country"  && age == "all age"){
-		        	return p;    
-		      	}
-		      	else if(country != "all country"  && age == "all age"){
-		        	return p.country == country
-		      	}
-		      	else {
-		        	if(age == "20"){
-		          		if( country != "all country"){
-		            		return p.country == country && p.age <=20;
-		          		}
-		          		if(country == "all country"){
-		            		return p.age <= 20;
-		          		} 	          
-		        	}
-		        	else if(age == "30"){
-		          		if( country != "all country"){
-		            		return p.country == country && p.age >20 && p.age<=30; 
-		          		}
-		          		if(country == "all country"){
-		            		return p.age >20 && p.age<=30;
-		          		} 
-		        	}
-		        	else if(age == "40"){
-		          		if(country != "all country"){
-		            		return p.country == country && p.age >30 && p.age<=40; 
-		          		}
-		          		if(country == "all country"){
-		            		return p.age >30 && p.age<=40;
-		          		} 
-		        	}
-		        	else if(age == "50"){
-		          		if(country != "all country"){
-		            		return p.country == country && p.age >40 && p.age<=50; 
-		          		}
-		          		if(country == "all country"){
-		            		return p.age >40 && p.age<=50; 
-		          		} 
-		        	}
-		        	else if(age == "60"){
-		          		if( country != "all country"){
-		            		return p.country == country && p.age >50 && p.age<=60; 
-		          		}
-		          		if(country == "all country"){
-		            		return p.age >50 && p.age<=60; 
-		          		} 
-		        	}
-		        	else{
-		          		if( country != "all country"){
-		            		return p.country == country && p.age >60; 
-		          		}
-		          		if( country == "all country"){
-		            		return p.age >60; 
-		          		} 
-		        	}
-		      	}
-		    });
-
-
-		  	// repaint the circles on after filter -- for the circle plot
-
-		  	svg.selectAll('.cir')
-		  	.data(newdata)
-		  	.enter().append('circle')
-		  	.attr("cx",function(d,i){ 
-		        //console.log(d.picture == "");
-		        if(d.picture != "") return -10;
-		        else return xScale(d.source) + 30 + d3.round(Math.random()*30);;
-		    })
-		  	.attr("cy",function(d,i){ 
-		    	if(d.picture != "") return -10;
-		    	else return yScale(d.net_worth);
-		  	})
-		  	.attr("r",10)
-		  	.attr("class","cir")
-		  	.style("fill",function(d,i){ 
-		    	if(i <=5 ) return "#black";
-		    	else return "black";
-		  	})
-		  	.on('click', tip.show)
-		  	.on('mouseout', tip.hide);
-
-		  	svg.selectAll(".imgman").data(newdata).enter().append("svg:image")
-		  	.attr("xlink:href",function(d){
-		    	// console.log(d.picture);
-		    	return d.picture;
-		  	}).attr("x",function(d,i){ return xScale(d.source) + 30 + d3.round(Math.random()*30);})
-		  	.attr("y",function(d,i){ return yScale(d.net_worth);})
-		  	.attr("class","imgman")
-		  	.on('click', tip.show)
-		  	.on('mouseout', tip.hide);
-
-		    // end for the circle plot
-
-		    //--- refresh data for the heatmap -- //
-		    //because the newdata is filtered for what should be ready to use, so we just form the data for the heat map based on it.
-
-		    var industry1 = document.getElementById("industry1").value;
-		    var industry2 = document.getElementById("industry2").value;
-		    var industry3 = document.getElementById("industry3").value;
-
-
-		    var count2_1 = 0 ,count2_2 = 0 , count2_3 = 0;
-		    var countnet2_1 = 0, countnet2_2 = 0, countnet2_3 = 0;
-		    if(newdata.length > 0){
-		      	for(var i = 0; i < newdata.length; i++){
-			        if(newdata[i].source == industry1) count2_1++;
+			    //caculate the number of billionaires first
+			    var count1 = 0 ,count2 = 0 , count3 = 0;
+			    for(var i = 0; i < people.length; i++){
+			      	if(people[i].source == industry1) count1++;
 			    }
-		      	for(var i2 = 0; i2 < newdata.length; i2++){
-		        	if(newdata[i2].source == industry2) count2_2++;
-		      	}
-		      	for(var i3 = 0; i3 < newdata.length; i3++){
-		        	if(newdata[i3].source == industry3) count2_3++;
-		      	}
+			    for(var i2 = 0; i2 < people.length; i2++){
+			      	if(people[i2].source == industry2) count2++;
+			    }
+			    for(var i3 = 0; i3 < people.length; i3++){
+			      	if(people[i3].source == industry3) count3++;
+			    }
 
-		      	//caculate the total networth
-		      	for(var t = 0; t < newdata.length; t++){
-		        	if(newdata[t].source == industry1) 
-		          		countnet2_1 = countnet2_1 + Number(newdata[t].net_worth);
-		      	}
-		      	for(var t2 = 0; t2 < newdata.length; t2++){
-		        	if(newdata[t2].source == industry2) 
-		          		countnet2_2 = countnet2_2 + Number(newdata[t2].net_worth);
-		      	}
-		      	for(var t3 = 0; t3 < newdata.length; t3++){
-		        	if(newdata[t3].source == industry3) 
-		        	  	countnet2_3 = countnet2_3 + Number(newdata[t3].net_worth);
-		      	}
-		      	countnet2_1 = d3.round(countnet2_1, 2);
-		      	countnet2_2 = d3.round(countnet2_2, 2);
-		      	countnet2_3 = d3.round(countnet2_3, 2);
-		    }
+			    //calculate the total net worth
+			    var countnet1 = 0; countnet2 = 0; countnet3 = 0;
+			    for(var t = 0; t < people.length; t++){
+			      	if(people[t].source == industry1) 
+			        	countnet1 = countnet1 + Number(people[t].net_worth);
+			    }
+			    for(var t2 = 0; t2 < people.length; t2++){
+			      	if(people[t2].source == industry2) 
+			        	countnet2 = countnet2 + Number(people[t2].net_worth);
+			    }
+			    for(var t3 = 0; t3 < people.length; t3++){
+			      	if(people[t3].source == industry3) countnet3 = countnet3 + Number(people[t3].net_worth);
+			    }
 
 
-		    var heatdata_net2 = [{
-		      	date: "net worth",
-		      	bucket: industry1,
-		      	count: countnet2_1
-		    },
-		    {
-		      	date: "net worth",
-		      	bucket: industry2,
-		      	count: countnet2_2
-		    },
-		    {
-		      	date: "net worth",
-		      	bucket: industry3,
-		      	count: countnet2_3
-		    },
-		    {
-		      	date: "number of billionaires",
-		      	bucket: industry1,
-		      	count: count2_1
-		    },
-		    {
-		      	date: "number of billionaires",
-		      	bucket: industry2,
-		      	count: count2_2
-		    },
-		    {
-		      	date: "number of billionaires",
-		      	bucket: industry3,
-		      	count: count2_3
-		    }
-		    ]
+			    // form the data here
+			    heatdata = people.filter(function (entrys) {
+			      	return (entrys.source == industry1) || (entrys.source == industry2) || (entrys.source == industry3);
+			    });
 
-		    //redraw the legend
-		    z.domain([0, d3.max(heatdata_net2, function(d) { return d.count; })]);
+			    var heatdata_net = [{
+			      	date: "net worth",
+			      	bucket: industry1,
+			      	count: countnet1
+			    },
+			    {
+			      	date: "net worth",
+			      	bucket: industry2,
+			      	count: countnet2
+			    },
+			    {
+			      	date: "net worth",
+			      	bucket: industry3,
+			      	count: countnet3
+			    },
+			    {
+			      	date: "number of billionaires",
+			      	bucket: industry1,
+			      	count: count1
+			    },
+			    {
+			      	date: "number of billionaires",
+			      	bucket: industry2,
+			      	count: count2
+			    },
+			    {
+			      	date: "number of billionaires",
+			      	bucket: industry3,
+			      	count: count3
+			    }
+			    ]
 
-		    svg_2.selectAll(".tile")
-		    .data(heatdata_net2)
-		    .enter().append("rect")
-		    .attr("class", "tile")
-		    .attr("x", function(d) { return xScale_2(d.bucket) - 10; })
-		    .attr("y", function(d) { return yScale_2(d.date); })
-		    .attr("width", 80)
-		    .attr("height",  50)
-		    .style("stroke", "white")
-		    .style("fill", function(d) { return z(d.count); })
-		    .on('click', tip2.show)
-		    .on('mouseout', tip2.hide);
+			    // console.log(heatdata_net);
 
-		    // Add a legend for the color values.
-		    var legend = svg_2.selectAll(".legend") 
-		    .data(z.ticks(6).slice(1).reverse())
-		    .enter().append("g")
-		    .attr("class", "legend")
-		    .attr("transform", function(d, i) { return "translate(" + (100+ i * 50) + "," + (30) + ")"; });
+				// -------------- end prepare the data for the heat map  -------------------//
 
-		    legend.append("rect")
-		    .attr("width", 50)
-		    .attr("height", 30)
-		    .style("fill", z);
+			    // draw axis for the heat map //
 
-		    legend.append("text")
-		    .attr("x", 5)
-		    .attr("y", 40)
-		    .attr("dy", ".35em")
-		    .text(String);
+			    var ytext_2 =["net worth","number of billionaires"];
 
-		    // svg_2.append("text")
-		    // .attr("class", "label")
-		    // .attr("x", width + 20)
-		    // .attr("y", 10)
-		    // .attr("dy", ".35em")
-		    // .text("Count");
-	  	} //--- end refresh data for the heatmap -- //
-	});
-}
+			    xScale_2= d3.scale.ordinal()
+			    .domain(Xtext)
+			    .rangeBands([padding, width2 - padding],0.3,0.1);
+
+			    yScale_2 = d3.scale.ordinal().domain(ytext_2).rangeBands([padding, height2 - padding],0.3,0.1);
+
+			    z = d3.scale.linear().range(["#CCFF99", "#227700"]);
+			    z.domain([0, d3.max(heatdata_net, function(d) { return d.count; })]);
+
+
+			    var xAxis_2 = d3.svg.axis().scale(xScale_2).orient("bottom");
+			    var yAxis_2 = d3.svg.axis().scale(yScale_2).orient("left");
+
+			    svg_2.append("g").attr("transform", "translate(0," + (height2 - padding)+ ")").attr("class", "Xaxis2 axis2 heatmap_text")
+			    .call(xAxis_2).selectAll("text").attr("transform","rotate(-10) translate(0, 10)");
+
+			    svg_2.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis3")
+			    .call(yAxis_2);
+
+			    //append the text label mannually
+			    svg_2.append("text").attr("class","axis2")
+			    .attr("x",5)
+			    .attr("y",120)
+			    .text("Cumulative");
+
+			    svg_2.append("text").attr("class","axis2")
+			    .attr("x",5)
+			    .attr("y",140)
+			    .text("net worth");
+
+			    svg_2.append("text").attr("class","axis2")
+			    .attr("x",5)
+			    .attr("y",180)
+			    .text("Number of");
+
+			    svg_2.append("text").attr("class","axis2")
+			    .attr("x",5)
+			    .attr("y",200)
+			    .text("billionaires");
+
+			    svg_2.selectAll(".tile")
+			    .data(heatdata_net)
+			    .enter().append("rect")
+			    .attr("class", "tile")
+			    .attr("x", function(d) { return xScale_2(d.bucket); })
+			    .attr("y", function(d) { return yScale_2(d.date);   })
+			    .attr("width", 80)
+			    .attr("height",  100)
+			    .style("stroke", "white")
+			    .style("fill", function(d) { return z(d.count); })
+			    .on('click', tip2.show)
+			    .on('mouseout', tip2.hide);
+
+		      	// Add a legend for the color values.
+		      	var legend = svg_2.selectAll(".legend") 
+		      	.data(z.ticks(6).slice(1).reverse())
+		      	.enter().append("g")
+		      	.attr("class", "legend")
+		      	.attr("transform", function(d, i) { return "translate(" + (width - 350 + i * 50) + "," + (30) + ")"; });
+
+		      	legend.append("rect")
+		      	.attr("width", 50)
+		      	.attr("height", 30)
+		      	.style("fill", z);
+
+		      	legend.append("text")
+		      	.attr("x", 5)
+		      	.attr("y", 40)
+		      	.attr("dy", ".35em")
+		      	.text(String);
+
+		      	// svg.append("text")
+		      	// .attr("class", "label")
+		      	// .attr("x", width + 20)
+		      	// .attr("y", 10)
+		      	// .attr("dy", ".35em")
+		      	// .text("Count");
+
+
+			    // -------  end draw the x y axis for the heat plot --------///
+
+			    //in case the country or age change so update it too;
+			    refreshdata();
+			} // end of the repaint function
+
+		    // code of filter here:
+
+		    d3.select("#country").on("change", function () {
+		    	refreshdata();
+		    });
+		    d3.select("#age").on("change", function () {
+		    	refreshdata();
+		    });
+
+
+		    function refreshdata(){
+
+			    //filter the data for both part;
+			    d3.selectAll(".cir").remove();
+			    d3.selectAll(".tile").remove();
+			    d3.selectAll(".legend").remove();
+			    d3.selectAll(".imgman").remove();
+
+			    country = document.getElementById("country").value;
+			    age = document.getElementById("age").value;
+
+
+			    newdata = pickedpeople.filter(function(p){
+			      	if(country == "all country"  && age == "all age"){
+			        	return p;    
+			      	}
+			      	else if(country != "all country"  && age == "all age"){
+			        	return p.country == country
+			      	}
+			      	else {
+			        	if(age == "20"){
+			          		if( country != "all country"){
+			            		return p.country == country && p.age <=20;
+			          		}
+			          		if(country == "all country"){
+			            		return p.age <= 20;
+			          		} 	          
+			        	}
+			        	else if(age == "30"){
+			          		if( country != "all country"){
+			            		return p.country == country && p.age >20 && p.age<=30; 
+			          		}
+			          		if(country == "all country"){
+			            		return p.age >20 && p.age<=30;
+			          		} 
+			        	}
+			        	else if(age == "40"){
+			          		if(country != "all country"){
+			            		return p.country == country && p.age >30 && p.age<=40; 
+			          		}
+			          		if(country == "all country"){
+			            		return p.age >30 && p.age<=40;
+			          		} 
+			        	}
+			        	else if(age == "50"){
+			          		if(country != "all country"){
+			            		return p.country == country && p.age >40 && p.age<=50; 
+			          		}
+			          		if(country == "all country"){
+			            		return p.age >40 && p.age<=50; 
+			          		} 
+			        	}
+			        	else if(age == "60"){
+			          		if( country != "all country"){
+			            		return p.country == country && p.age >50 && p.age<=60; 
+			          		}
+			          		if(country == "all country"){
+			            		return p.age >50 && p.age<=60; 
+			          		} 
+			        	}
+			        	else{
+			          		if( country != "all country"){
+			            		return p.country == country && p.age >60; 
+			          		}
+			          		if( country == "all country"){
+			            		return p.age >60; 
+			          		} 
+			        	}
+			      	}
+			    });
+
+
+			  	// repaint the circles on after filter -- for the circle plot
+
+			  	svg.selectAll('.cir')
+			  	.data(newdata)
+			  	.enter().append('circle')
+			  	.attr("cx",function(d,i){ 
+			        //console.log(d.picture == "");
+			        if(d.picture != "") return -10;
+			        else return xScale(d.source) + 30 + d3.round(Math.random()*30);;
+			    })
+			  	.attr("cy",function(d,i){ 
+			    	if(d.picture != "") return -10;
+			    	else return yScale(d.net_worth);
+			  	})
+			  	.attr("r",10)
+			  	.attr("class","cir")
+			  	.style("fill",function(d,i){ 
+			    	if(i <=5 ) return "#black";
+			    	else return "black";
+			  	})
+			  	.on('click', tip.show)
+			  	.on('mouseout', tip.hide);
+
+			  	svg.selectAll(".imgman").data(newdata).enter().append("svg:image")
+			  	.attr("xlink:href",function(d){
+			    	// console.log(d.picture);
+			    	return d.picture;
+			  	}).attr("x",function(d,i){ return xScale(d.source) + 30 + d3.round(Math.random()*30);})
+			  	.attr("y",function(d,i){ return yScale(d.net_worth);})
+			  	.attr("class","imgman")
+			  	.on('click', tip.show)
+			  	.on('mouseout', tip.hide);
+
+			    // end for the circle plot
+
+			    //--- refresh data for the heatmap -- //
+			    //because the newdata is filtered for what should be ready to use, so we just form the data for the heat map based on it.
+
+			    var industry1 = document.getElementById("industry1").value;
+			    var industry2 = document.getElementById("industry2").value;
+			    var industry3 = document.getElementById("industry3").value;
+
+
+			    var count2_1 = 0 ,count2_2 = 0 , count2_3 = 0;
+			    var countnet2_1 = 0, countnet2_2 = 0, countnet2_3 = 0;
+			    if(newdata.length > 0){
+			      	for(var i = 0; i < newdata.length; i++){
+				        if(newdata[i].source == industry1) count2_1++;
+				    }
+			      	for(var i2 = 0; i2 < newdata.length; i2++){
+			        	if(newdata[i2].source == industry2) count2_2++;
+			      	}
+			      	for(var i3 = 0; i3 < newdata.length; i3++){
+			        	if(newdata[i3].source == industry3) count2_3++;
+			      	}
+
+			      	//caculate the total networth
+			      	for(var t = 0; t < newdata.length; t++){
+			        	if(newdata[t].source == industry1) 
+			          		countnet2_1 = countnet2_1 + Number(newdata[t].net_worth);
+			      	}
+			      	for(var t2 = 0; t2 < newdata.length; t2++){
+			        	if(newdata[t2].source == industry2) 
+			          		countnet2_2 = countnet2_2 + Number(newdata[t2].net_worth);
+			      	}
+			      	for(var t3 = 0; t3 < newdata.length; t3++){
+			        	if(newdata[t3].source == industry3) 
+			        	  	countnet2_3 = countnet2_3 + Number(newdata[t3].net_worth);
+			      	}
+			      	countnet2_1 = d3.round(countnet2_1, 2);
+			      	countnet2_2 = d3.round(countnet2_2, 2);
+			      	countnet2_3 = d3.round(countnet2_3, 2);
+			    }
+
+
+			    var heatdata_net2 = [{
+			      	date: "net worth",
+			      	bucket: industry1,
+			      	count: countnet2_1
+			    },
+			    {
+			      	date: "net worth",
+			      	bucket: industry2,
+			      	count: countnet2_2
+			    },
+			    {
+			      	date: "net worth",
+			      	bucket: industry3,
+			      	count: countnet2_3
+			    },
+			    {
+			      	date: "number of billionaires",
+			      	bucket: industry1,
+			      	count: count2_1
+			    },
+			    {
+			      	date: "number of billionaires",
+			      	bucket: industry2,
+			      	count: count2_2
+			    },
+			    {
+			      	date: "number of billionaires",
+			      	bucket: industry3,
+			      	count: count2_3
+			    }
+			    ]
+
+			    //redraw the legend
+			    z.domain([0, d3.max(heatdata_net2, function(d) { return d.count; })]);
+
+			    svg_2.selectAll(".tile")
+			    .data(heatdata_net2)
+			    .enter().append("rect")
+			    .attr("class", "tile")
+			    .attr("x", function(d) { return xScale_2(d.bucket) - 10; })
+			    .attr("y", function(d) { return yScale_2(d.date); })
+			    .attr("width", 80)
+			    .attr("height",  50)
+			    .style("stroke", "white")
+			    .style("fill", function(d) { return z(d.count); })
+			    .on('click', tip2.show)
+			    .on('mouseout', tip2.hide);
+
+			    // Add a legend for the color values.
+			    var legend = svg_2.selectAll(".legend") 
+			    .data(z.ticks(6).slice(1).reverse())
+			    .enter().append("g")
+			    .attr("class", "legend")
+			    .attr("transform", function(d, i) { return "translate(" + (100+ i * 50) + "," + (30) + ")"; });
+
+			    legend.append("rect")
+			    .attr("width", 50)
+			    .attr("height", 30)
+			    .style("fill", z);
+
+			    legend.append("text")
+			    .attr("x", 5)
+			    .attr("y", 40)
+			    .attr("dy", ".35em")
+			    .text(String);
+
+			    // svg_2.append("text")
+			    // .attr("class", "label")
+			    // .attr("x", width + 20)
+			    // .attr("y", 10)
+			    // .attr("dy", ".35em")
+			    // .text("Count");
+		  	} //--- end refresh data for the heatmap -- //
+		});
+	}
 </script>
 
 <!-- make the college plot -->
